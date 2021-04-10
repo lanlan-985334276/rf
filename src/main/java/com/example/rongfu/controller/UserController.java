@@ -44,8 +44,18 @@ public class UserController extends BaseController {
     JsonResult<User> login(String username, String password, HttpSession session) {
         User data = userService.login(username, password); //ctrl+alt+t
         //登录成功，保存登录用户信息供后续业务使用
+        System.out.println(data);
         session.setAttribute("userId", data.getUserId());
         session.setAttribute("username", data.getUserName());
+        session.setAttribute("isEnterprise",data.isEnterprise());
+        session.setAttribute("isAdmin",data.isAdmin());
         return new JsonResult<>(OK, data);
+    }
+
+
+    @RequestMapping("/sendCode")
+    JsonResult<Void> sendCode(String username) {
+        userService.sendCode(username);
+        return new JsonResult<>(OK);
     }
 }

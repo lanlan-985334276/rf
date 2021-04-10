@@ -10,9 +10,18 @@ import com.example.rongfu.mapper.UserMapper;
 import com.example.rongfu.mapper.VerificationCodeMapper;
 import com.example.rongfu.service.IUserService;
 import com.example.rongfu.service.ex.*;
+import com.example.rongfu.util.SendMessageUtils;
 import com.example.rongfu.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import sun.rmi.runtime.Log;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 //@Service注解，在Springboot环境加载时，实现类的一个对象交给Spring框架容器进行管理
 @Service
@@ -51,6 +60,11 @@ public class UserServiceImpl implements IUserService {
         //判断企业是否已注册
         if (enterpriseMapper.findByName(eqName) != null)
             throw new UserNameErrorException("注册失败，企业已注册！");
+        Enterprise enterprise = new Enterprise();
+        enterprise.setEpName(eqName);
+        enterprise.setUserId(result.getUserId());
+        enterprise.setTime(new Timestamp(new Date().getTime()));
+        System.out.println(vCode);
         codeMapper.delete(vCode.getVcId());
         result.setUserName(username);
         result.setPassword(password);
@@ -58,7 +72,12 @@ public class UserServiceImpl implements IUserService {
         Integer rows = userMapper.insert(result);
         //若影响行数不为1，则抛出InsertException
         if (rows != 1) {
-            throw new InsertException("注册失败，未知插入错误！请联系管理员");
+            throw new InsertException("注册失败，未知插入错误！请联系管理员!");
+        }
+        rows = enterpriseMapper.insert(enterprise);
+        if (rows != 1) {
+            userMapper.delete(result.getUserId());
+            throw new FailedException("注册失败，未知插入错误！请联系管理员!");
         }
     }
 
@@ -82,17 +101,65 @@ public class UserServiceImpl implements IUserService {
         }
         Enterprise enterprise = enterpriseMapper.findByUserId(result.getUserId());
         Admin admin = adminMapper.findByUserId(result.getUserId());
-        if (enterprise == null || admin == null)
-            throw new AdminNotFoundException("没有权限，请联系您的企业管理员！");
-        else if (enterprise != null) {
+
+        if (enterprise != null) {
             result.setEnterprise(true);
-        } else {
+        } else if (admin != null) {
             result.setAdmin(true);
-        }
+        } else
+            throw new AdminNotFoundException("没有权限，请联系您的企业管理员！");
         //返回登录者的用户信息
-        User user = new User();
-        user.setUserId(result.getUserId());
-        user.setUserName(result.getUserName());
-        return user;
+        result.setLastLoginTime(new Timestamp(new Date().getTime()));
+        if (userMapper.updateLastLoginTime(result) != 1)
+            throw new FailedException("登录失败，未知错误，请联系管理员！");
+        return result;
+    }
+
+
+    @Value("${spring.mail.username}")
+    private String from;
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Override
+    public void sendCode(String username) {
+        String code = Integer.toString((int) ((Math.random() * 9 + 1) * 100000));
+        String content = "欢迎您使用RongFu平台，您的验证码为：" + code;
+        if (StringUtils.isEmail(username)) {
+            try {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom(from); // 邮件发送者
+                message.setTo(username); // 邮件接受者
+                message.setSubject("【RongFu】验证码"); // 主题
+                message.setText(content); // 内容
+                mailSender.send(message);
+            } catch (MailException e) {
+                throw new FailedException("发送失败，请重试");
+            }
+        } else if (StringUtils.isPhone(username)) {
+            Integer resultCode = SendMessageUtils.send("lanlan985334276",
+                    "d41d8cd98f00b204e980",
+                    username, content);
+            System.out.println("IMessageService:resultCode=" + resultCode);
+            switch (resultCode) {
+                case -4:
+                    throw new FailedException("手机号格式不正确");
+                case -41:
+                    throw new FailedException("手机号码为空！");
+                default:
+                    break;
+            }
+
+        } else
+            throw new FailedException("格式不正确！");
+        long time = new Date().getTime();
+        VerificationCode vCode = new VerificationCode();
+        vCode.setVerificationCode(code);
+        vCode.setUsername(username);
+        vCode.setStartTime(new Timestamp(time));
+        vCode.setEndTime(new Timestamp(time + 5 * 60 * 1000));
+        if (codeMapper.insert(vCode) != 1) {
+            throw new FailedException("发送验证码失败，未知插入错误，请联系管理员！");
+        }
     }
 }

@@ -1,12 +1,13 @@
 package com.example.rongfu.entity;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Enterprise {
     private int epId;
     private int userId;
     private String epName;
-    private Date time;
+    private Timestamp time;
 
     public Enterprise() {
     }
@@ -35,11 +36,11 @@ public class Enterprise {
         this.userId = userId;
     }
 
-    public Date getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Timestamp time) {
         this.time = time;
     }
 

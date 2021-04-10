@@ -1,6 +1,7 @@
 package com.example.rongfu.entity;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class User {
     private int userId;
@@ -31,7 +32,7 @@ public class User {
     /**
      * 上次登录时间
      */
-    private Date lastLoginTime;
+    private Timestamp lastLoginTime;
     /**
      * 账号状态 0:离线 1:在线 2:注销
      */
@@ -141,15 +142,15 @@ public class User {
         return address;
     }
 
-    public void setAddress(String adress) {
+    public void setAddress(String address) {
         this.address = address;
     }
 
-    public Date getLastLoginTime() {
+    public Timestamp getLastLoginTime() {
         return lastLoginTime;
     }
 
-    public void setLastLoginTime(Date lastLoginTime) {
+    public void setLastLoginTime(Timestamp lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
 

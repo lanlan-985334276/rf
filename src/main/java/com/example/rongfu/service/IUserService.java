@@ -28,4 +28,6 @@ public interface IUserService {
      * @return 登录用户的信息
      */
     User login(String username, String password);
+
+    void sendCode(String username);
 }

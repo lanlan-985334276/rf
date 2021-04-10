@@ -1,6 +1,7 @@
 package com.example.rongfu.entity;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Date;
 
 //验证码
 public class VerificationCode {
@@ -15,11 +16,11 @@ public class VerificationCode {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private Timestamp startTime;
     /**
      * 结束时间
      */
-    private Date endTime;
+    private Timestamp endTime;
 
     private String username;
 
@@ -42,19 +43,19 @@ public class VerificationCode {
         this.verificationCode = verificationCode;
     }
 
-    public Date getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public Timestamp getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
     }
 

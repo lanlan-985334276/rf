@@ -40,10 +40,10 @@
 
         <form id="form-login" class="m-t" role="form" action="index.html">
             <div class="form-group">
-                <input type="email" class="form-control" placeholder="用户名" required="">
+                <input name="username" type="email" class="form-control" placeholder="邮箱" required="">
             </div>
             <div class="form-group">
-                <input type="password" class="form-control" placeholder="密码" required="">
+                <input name="username" type="password" class="form-control" placeholder="密码" required="">
             </div>
             <button type="submit" class="btn btn-primary block full-width m-b">登 录</button>
 
@@ -64,7 +64,7 @@
 <script type="text/javascript">
     $("#btn-login").click(function () {
         if ($("#username").val() == ""){
-            alert("用户名不能为空！");
+            alert("邮箱不能为空！");
             return;
         }
 
@@ -80,8 +80,8 @@
             method: "post", //请求方式
             dataType: "json", //返回值类型
             success: function(result){ //服务器成功返回时，执行的匿名函数
-                if( result.state == 2000){
-                    alert("登录成功！")
+                if( result.state == 1000){
+                    alert("登录成功！"+result);
                     //location.href = "index.html"; //跳转到登录页
                 } else {
                     alert(result.message);

@@ -17,7 +17,7 @@ public interface AdminMapper {
     @Select("select * from admin where epid=#{epid}")
     Admin findByEpId(int epid);
 
-    @Select("select * from admin where email=#{userid}")
+    @Select("select * from admin where userid=#{userid}")
     Admin findByUserId(int userid);
 
     /**

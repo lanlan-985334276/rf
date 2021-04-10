@@ -1,9 +1,7 @@
 package com.example.rongfu.mapper;
 
 import com.example.rongfu.entity.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 /**
  * 处理用户数据的持久层接口
@@ -34,6 +32,12 @@ public interface UserMapper {
      * @return 受影响的行数
      */
     @Insert("insert into user(username,password,sex,photo,phone,email,lastlogintime,status,idnumber,nativeplace,address) " +
-            "values(#{username},#{password},#{sex},#{photo},#{phone},#{email},#{lastLoginTime},#{status},#{idNumber},#{nativePlace},#{address})")
+            "values(#{userName},#{password},#{sex},#{photo},#{phone},#{email},#{lastLoginTime},#{status},#{idNumber},#{nativePlace},#{address})")
     Integer insert(User user);
+
+    @Update("update user set lastLoginTime=#{lastLoginTime} where userid=#{userId}")
+    Integer updateLastLoginTime(User user);
+
+    @Delete("delete from user where userid=#{userid}")
+    Integer delete(int userid);
 }
