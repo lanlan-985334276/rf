@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/register.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:52 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 注册</title>
+    <meta name="keywords" content="RF">
+    <meta name="description" content="RF">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <script>if (window.top !== window.self) {
+        window.top.location = window.location;
+    }</script>
+
+</head>
+
+<body class="gray-bg">
+
+<div class="middle-box text-center loginscreen   animated fadeInDown">
+    <div>
+        <div>
+            <h1 class="logo-name">RF</h1>
+
+        </div>
+        <h3>欢迎注册 RF</h3>
+        <p>创建一个RF新账户</p>
+        <form id="form-reg" class="m-t" role="form" action="login.html">
+            <div class="form-group">
+                <input id="username" name="username" type="text" class="form-control" placeholder="请输入邮箱或手机号"
+                       required="">
+            </div>
+            <div class="input-group form-group">
+                <input type="text" class="form-control" placeholder="请输入验证码">
+                <span class="input-group-btn">
+                    <button id="send-code" type="button" class="btn btn-primary">发送验证码</button>
+                </span>
+            </div>
+            <div class="form-group">
+                <input id="password" name="password" type="password" class="form-control" placeholder="请输入密码"
+                       required="">
+            </div>
+            <div class="form-group">
+                <input id="password2" name="password2" type="password" class="form-control" placeholder="请再次输入密码"
+                       required="">
+            </div>
+            <button id="btn-reg" type="button" class="btn btn-primary block full-width m-b">注 册</button>
+
+            <p class="text-muted text-center">
+                <small>已经有账户了？</small>
+                <a href="login.html">点此登录</a>
+            </p>
+
+        </form>
+    </div>
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/plugins/iCheck/icheck.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green",})
+    });
+</script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+</body>
+
+<script type="text/javascript">
+    $("#btn-reg").click(function () {
+        if ($("#username").val() == "") {
+            alert("用户名不能为空！");
+            return;
+        }
+
+        if ($("#password").val() == "") {
+            alert("密码不能为空！");
+            return;
+        }
+
+        if ($("#password").val() != $("#password2").val()) {
+            alert("两次密码输入不一致！");
+            return;
+        }
+
+        //发送ajax请求，请求注册
+        $.ajax({
+            url: "/users/reg", //请求url
+            data: $("#form-reg").serialize(), //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 2000) {
+                    alert("注册成功！")
+                    location.href = "login.html"; //跳转到登录页
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/register.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:52 GMT -->
+</html>

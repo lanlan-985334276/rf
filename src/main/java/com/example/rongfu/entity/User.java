@@ -1,0 +1,191 @@
+package com.example.rongfu.entity;
+
+import java.sql.Date;
+
+public class User {
+    private int userId;
+    /**
+     * 用户名
+     */
+    private String userName;
+    /**
+     * 密码
+     */
+    private String password;
+    /**
+     * 性别 0:男 1:女
+     */
+    private int sex;
+    /**
+     * 头像
+     */
+    private String photo;
+    /**
+     * 电话号码
+     */
+    private String phone;
+    /**
+     * 邮箱
+     */
+    private String email;
+    /**
+     * 上次登录时间
+     */
+    private Date lastLoginTime;
+    /**
+     * 账号状态 0:离线 1:在线 2:注销
+     */
+    private int status;
+    /**
+     * 身份证号
+     */
+    private String idNumber;
+    /**
+     * 籍贯
+     */
+    private String nativePlace;
+
+    /**
+     * 住址
+     */
+    private String address;
+
+    private boolean isAdmin;
+
+    private boolean isEnterprise;
+
+    public User() {
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public void setSex(int sex) {
+        this.sex = sex;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(String idNumber) {
+        this.idNumber = idNumber;
+    }
+
+    public String getNativePlace() {
+        return nativePlace;
+    }
+
+    public void setNativePlace(String nativePlace) {
+        this.nativePlace = nativePlace;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String adress) {
+        this.address = address;
+    }
+
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    public boolean isEnterprise() {
+        return isEnterprise;
+    }
+
+    public void setEnterprise(boolean enterprise) {
+        isEnterprise = enterprise;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", sex=" + sex +
+                ", photo='" + photo + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", lastLoginTime=" + lastLoginTime +
+                ", status=" + status +
+                ", idNumber='" + idNumber + '\'' +
+                ", nativePlace='" + nativePlace + '\'' +
+                ", address='" + address + '\'' +
+                ", isAdmin=" + isAdmin +
+                ", isEnterprise=" + isEnterprise +
+                '}';
+    }
+}
