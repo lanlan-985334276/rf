@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 联系人</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>添加员工</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="input-group middle-box text-center" style="margin-top: 50px">
+                        <input id="username" type="text" class="form-control" style="" placeholder="请输入用户名">
+                        <span class="input-group-btn">
+                            <button id="btn-find" name="btn-find" type="button" class="btn btn-primary">搜索</button>
+                        </span>
+                    </div>
+                    <div class="wrapper wrapper-content animated fadeInRight">
+                        <div class="row" id="staffs">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/content.min.js?v=1.0.0"></script>
+<script>
+    $(document).ready(function () {
+        $(".contact-box").each(function () {
+            animationHover(this, "pulse")
+        })
+    });
+</script>
+
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+</body>
+<script type="text/javascript">
+    $("#btn-find").click(function () {
+        if ($("#username").val() == "") {
+            alert("用户名不能为空！");
+            return;
+        }
+        $.ajax({
+            url: "/users/queryUserToAdd", //请求url
+            data: "username=" + $("#username").val(),
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#staffs").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        $("#staffs").append(html);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        console.log(list[i].userId);
+                        let html = '<div class="col-sm-4" id="div-#{userId}">' +
+                            '<div class="contact-box">' +
+                            '<a href="#">' +
+                            '<div class="col-sm-4">' +
+                            '<div class="text-center">' +
+                            '<img alt="image" class="img-circle m-t-xs img-responsive" src="#{photo}" style="width:70px; height: 70px;">' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="col-sm-8">' +
+                            '<h3><strong>#{username}</strong></h3>' +
+                            '<p><i class="fa fa-map-marker"></i> #{nativePlace}</p>' +
+                            '<address>' +
+                            'E-mail:#{email}<br>' +
+                            '<abbr title="Phone">Tel:</abbr> #{phone} ' +
+                            '</address>' +
+                            '</div>' +
+                            '<div class="clearfix middle-box">' +
+                            '<span class="input-group-btn">' +
+                            '<button id="add-#{userId}" type="button" class="btn btn-primary">添加</button>' +
+                            '</span>' +
+                            '</div>' +
+                            '</a>' +
+                            '</div>' +
+                            '</div>';
+                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/ng.png");
+                        else
+                            html = html.replace(/#{photo}/g, list[i].photo);
+                        html = html.replace(/#{username}/g, list[i].userName);
+                        html = html.replace(/#{nativePlace}/g, list[i].nativePlace == "" ? "" : list[i].nativePlace);
+                        html = html.replace(/#{email}/g, list[i].email == "" ? "" : list[i].email);
+                        html = html.replace(/#{phone}/g, list[i].phone == "" ? "" : list[i].phone);
+                        html = html.replace(/#{userId}/g, list[i].userId);
+                        $("#staffs").append(html);
+                        $("#add-" + list[i].userId).click(function () {
+                            $.ajax({
+                                url: "/users/addStaff", //请求url
+                                data: "userId=" + list[i].userId, //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
+                                method: "post", //请求方式
+                                dataType: "json", //返回值类型
+                                success: function (result) { //服务器成功返回时，执行的匿名函数
+                                    if (result.state == 1000) {
+                                        alert("添加成功！");
+                                        $("#div-" + list[i].userId).remove();
+                                    } else {
+                                        alert(result.message);
+                                    }
+                                }
+                            });
+                        });
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+</script>
+</html>

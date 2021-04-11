@@ -1,7 +1,10 @@
 package com.example.rongfu.mapper;
 
+import com.example.rongfu.entity.Staff;
 import com.example.rongfu.entity.User;
 import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 /**
  * 处理用户数据的持久层接口
@@ -25,6 +28,9 @@ public interface UserMapper {
     @Select("select * from user where email=#{email}")
     User findByEmail(String email);
 
+    @Select("select * from user where userid=#{userid}")
+    User findByUserId(int userid);
+
     /**
      * 插入记录
      *
@@ -40,4 +46,7 @@ public interface UserMapper {
 
     @Delete("delete from user where userid=#{userid}")
     Integer delete(int userid);
+
+    @Select("SELECT * from `user` where username like #{username} and userid NOT in (select userid from enterprise) and userid not in(select userid from staff)")
+    List<User> findNotInEnterprise(String username);
 }

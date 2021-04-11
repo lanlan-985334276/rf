@@ -1,9 +1,9 @@
 package com.example.rongfu.service;
 
 
-import com.example.rongfu.entity.Enterprise;
 import com.example.rongfu.entity.User;
-import com.example.rongfu.entity.VerificationCode;
+
+import java.util.List;
 
 /**
  * 处理用户业务的接口
@@ -30,4 +30,8 @@ public interface IUserService {
     User login(String username, String password);
 
     void sendCode(String username);
+
+    List<User> queryUserToAdd(String username);
+
+    void addStaff(int mUserId, int userId);
 }

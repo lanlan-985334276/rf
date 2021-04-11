@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 //@Controller注解，SpringBoot环境加载时，会自动创建该控
@@ -47,8 +48,8 @@ public class UserController extends BaseController {
         System.out.println(data);
         session.setAttribute("userId", data.getUserId());
         session.setAttribute("username", data.getUserName());
-        session.setAttribute("isEnterprise",data.isEnterprise());
-        session.setAttribute("isAdmin",data.isAdmin());
+        session.setAttribute("isEnterprise", data.isEnterprise());
+        session.setAttribute("isAdmin", data.isAdmin());
         return new JsonResult<>(OK, data);
     }
 
@@ -56,6 +57,18 @@ public class UserController extends BaseController {
     @RequestMapping("/sendCode")
     JsonResult<Void> sendCode(String username) {
         userService.sendCode(username);
+        return new JsonResult<>(OK);
+    }
+
+    @RequestMapping("/queryUserToAdd")
+    JsonResult<List<User>> queryUserToAdd(String username) {
+        return new JsonResult<>(OK, userService.queryUserToAdd(username));
+    }
+
+    @RequestMapping("/addStaff")
+    JsonResult<Void> addStaff(int userId, HttpSession session) {
+        int mUserId = Integer.valueOf(session.getAttribute("userId").toString());
+        userService.addStaff(mUserId, userId);
         return new JsonResult<>(OK);
     }
 }

@@ -1,13 +1,7 @@
 package com.example.rongfu.service.impl;
 
-import com.example.rongfu.entity.Admin;
-import com.example.rongfu.entity.Enterprise;
-import com.example.rongfu.entity.User;
-import com.example.rongfu.entity.VerificationCode;
-import com.example.rongfu.mapper.AdminMapper;
-import com.example.rongfu.mapper.EnterpriseMapper;
-import com.example.rongfu.mapper.UserMapper;
-import com.example.rongfu.mapper.VerificationCodeMapper;
+import com.example.rongfu.entity.*;
+import com.example.rongfu.mapper.*;
 import com.example.rongfu.service.IUserService;
 import com.example.rongfu.service.ex.*;
 import com.example.rongfu.util.SendMessageUtils;
@@ -18,10 +12,10 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import sun.rmi.runtime.Log;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 //@Service注解，在Springboot环境加载时，实现类的一个对象交给Spring框架容器进行管理
 @Service
@@ -34,6 +28,8 @@ public class UserServiceImpl implements IUserService {
     private VerificationCodeMapper codeMapper;
     @Autowired
     private AdminMapper adminMapper;
+    @Autowired
+    private StaffMapper staffMapper;
 
     @Override
     public void reg(String username, String password, String code, String eqName) {
@@ -161,5 +157,24 @@ public class UserServiceImpl implements IUserService {
         if (codeMapper.insert(vCode) != 1) {
             throw new FailedException("发送验证码失败，未知插入错误，请联系管理员！");
         }
+    }
+
+    @Override
+    public List<User> queryUserToAdd(String username) {
+        List<User> users = userMapper.findNotInEnterprise("%" + username + "%");
+        return users;
+    }
+
+    @Override
+    public void addStaff(int mUserId, int userId) {
+        Enterprise enterprise = enterpriseMapper.findByUserId(mUserId);
+        if (enterprise == null)
+            throw new FailedException("未知错误，请尝试重新登录！");
+        Staff staff = new Staff();
+        staff.setUserId(mUserId);
+        staff.setEpId(enterprise.getEpId());
+        staff.setAddTime(new Timestamp(new Date().getTime()));
+        if (staffMapper.insert(staff) != 1)
+            throw new FailedException("添加失败，未知插入错误！");
     }
 }
