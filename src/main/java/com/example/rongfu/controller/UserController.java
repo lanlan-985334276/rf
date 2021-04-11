@@ -71,4 +71,16 @@ public class UserController extends BaseController {
         userService.addStaff(mUserId, userId);
         return new JsonResult<>(OK);
     }
+
+    @RequestMapping("/deleteStaff")
+    JsonResult<Void> deleteStaff(int userId) {
+        userService.deleteStaff(userId);
+        return new JsonResult<>(OK);
+    }
+
+    @RequestMapping("/queryStaff")
+    JsonResult<List<User>> queryStaff(String username, HttpSession session) {
+        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+        return new JsonResult<>(OK, username!=null ? userService.queryStaff2(userId, username) : userService.queryStaff(userId));
+    }
 }

@@ -29,11 +29,16 @@
                     <h5>添加员工</h5>
                 </div>
                 <div class="ibox-content">
-                    <div class="input-group middle-box text-center" style="margin-top: 50px">
-                        <input id="username" type="text" class="form-control" style="" placeholder="请输入用户名">
-                        <span class="input-group-btn">
-                            <button id="btn-find" name="btn-find" type="button" class="btn btn-primary">搜索</button>
-                        </span>
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-1">
+                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i class="fa fa-refresh"></i> 刷新</button>
+                        </div>
+                        <div class="col-md-11">
+                            <div class="input-group">
+                                <input id="username" type="text" placeholder="请输入用户名" class="input-sm form-control"> <span class="input-group-btn">
+                                        <button id="btn-find" type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="wrapper wrapper-content animated fadeInRight">
                         <div class="row" id="staffs">

@@ -34,4 +34,9 @@ public interface IUserService {
     List<User> queryUserToAdd(String username);
 
     void addStaff(int mUserId, int userId);
+
+    void deleteStaff(int userId);
+
+    List<User> queryStaff(int userId);
+    List<User> queryStaff2(int userId,String username);
 }

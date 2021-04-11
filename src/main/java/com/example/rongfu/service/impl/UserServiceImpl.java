@@ -171,10 +171,34 @@ public class UserServiceImpl implements IUserService {
         if (enterprise == null)
             throw new FailedException("未知错误，请尝试重新登录！");
         Staff staff = new Staff();
-        staff.setUserId(mUserId);
+        staff.setUserId(userId);
         staff.setEpId(enterprise.getEpId());
         staff.setAddTime(new Timestamp(new Date().getTime()));
+        System.out.println(staff);
         if (staffMapper.insert(staff) != 1)
             throw new FailedException("添加失败，未知插入错误！");
+    }
+
+    @Override
+    public void deleteStaff(int userId) {
+        System.out.println(userId);
+        if (staffMapper.delete(userId) != 1)
+            throw new FailedException("删除失败，未知删除错误，请联系管理员！");
+    }
+
+    @Override
+    public List<User> queryStaff(int userId) {
+        Enterprise enterprise = enterpriseMapper.findByUserId(userId);
+        if (enterprise == null)
+            throw new FailedException("未知错误，请重新登录！");
+        return staffMapper.findByEnterpriseId(enterprise.getEpId());
+    }
+
+    @Override
+    public List<User> queryStaff2(int userId, String username) {
+        Enterprise enterprise = enterpriseMapper.findByUserId(userId);
+        if (enterprise == null)
+            throw new FailedException("未知错误，请重新登录！");
+        return staffMapper.findByEnterpriseId2(enterprise.getEpId(), "%" + username + "%");
     }
 }

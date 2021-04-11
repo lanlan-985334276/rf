@@ -42,4 +42,14 @@ public class Staff {
     public void setAddTime(Timestamp addTime) {
         this.addTime = addTime;
     }
+
+    @Override
+    public String toString() {
+        return "Staff{" +
+                "staffId=" + staffId +
+                ", userId=" + userId +
+                ", epId=" + epId +
+                ", addTime=" + addTime +
+                '}';
+    }
 }
