@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.UUID;
 
-@WebServlet(name = "ImageUpload", urlPatterns = "/ImageUpload")
+@WebServlet(name = "ImageUpload", urlPatterns = "/imageUpload")
 public class ImageUpload extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");//获取文件名时防止中文乱码

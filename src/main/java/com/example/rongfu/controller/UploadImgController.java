@@ -22,8 +22,8 @@ public class UploadImgController extends BaseController {
     private HttpServletRequest request;
 
     @RequestMapping("/img")
-    JsonResult<Void> img(@RequestParam("file") MultipartFile file) {
-        uploadImgService.upload(file);
-        return new JsonResult<>(OK);
+    JsonResult<String> img(@RequestParam("file") MultipartFile file) {
+        String photo = uploadImgService.upload(file);
+        return new JsonResult<>(OK, photo);
     }
 }

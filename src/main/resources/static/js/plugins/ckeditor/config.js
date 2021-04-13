@@ -52,8 +52,8 @@ CKEDITOR.editorConfig = function( config ) {
 		path=path+  window.location.protocol + '//' + window.location.host + '/' + webName;
 	}
 
-	config.filebrowserUploadUrl=path+ "/imageUpload?action=fileUpload"; //待会要上传的action或servlet
-	config.filebrowserImageUploadUrl =path+ '/imageUpload?action=fileUpload&type=Images';
+	config.filebrowserUploadUrl=path+ "/upload/img"; //待会要上传的action或servlet
+	config.filebrowserImageUploadUrl =path+ '/upload/img';
 	config.filebrowserBrowseUrl =path+ "/imageUpload?action=fileBrowse";//这里的路径相对于根目录
 	config.filebrowserImageBrowseUrl = path+ '/imageUpload?action=fileBrowse&type=Images';
 };
