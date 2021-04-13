@@ -47,6 +47,6 @@ public interface UserMapper {
     @Delete("delete from user where userid=#{userid}")
     Integer delete(int userid);
 
-    @Select("SELECT * from `user` where username like #{username} and userid NOT in (select userid from enterprise) and userid not in(select userid from staff)")
+    @Select("select user.* from user,staff where user.userid not in(staff.userid) and user.username like #{username}")
     List<User> findNotInEnterprise(String username);
 }

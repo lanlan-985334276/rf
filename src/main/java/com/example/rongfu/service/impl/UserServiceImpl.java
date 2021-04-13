@@ -75,6 +75,12 @@ public class UserServiceImpl implements IUserService {
             userMapper.delete(result.getUserId());
             throw new FailedException("注册失败，未知插入错误！请联系管理员!");
         }
+        rows = adminMapper.insert(result.getUserId());
+        if (rows != 1) {
+            enterpriseMapper.delete(enterpriseMapper.findByUserId(result.getUserId()).getEpId());
+            userMapper.delete(result.getUserId());
+            throw new FailedException("注册失败，未知插入错误！请联系管理员!");
+        }
     }
 
     @Override

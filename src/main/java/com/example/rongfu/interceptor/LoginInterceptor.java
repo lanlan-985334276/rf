@@ -10,10 +10,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginInterceptor implements HandlerInterceptor {
     //preHandle，在服务器处理所有的请求之前，
+
+
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println(request.getRequestURL());
-        System.out.println("userId:"+request.getSession().getAttribute("userId"));
         //if (request.getRequestURL().equals("/login.html")) return true;
         if (request.getSession().getAttribute("userId") == null) {
             //若未登录,转向登录页面

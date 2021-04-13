@@ -55,6 +55,8 @@ public class User {
 
     private boolean isEnterprise;
 
+    private Timestamp date;
+
     public User() {
     }
 
@@ -170,6 +172,14 @@ public class User {
         isEnterprise = enterprise;
     }
 
+    public Timestamp getDate() {
+        return date;
+    }
+
+    public void setDate(Timestamp date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -187,6 +197,7 @@ public class User {
                 ", address='" + address + '\'' +
                 ", isAdmin=" + isAdmin +
                 ", isEnterprise=" + isEnterprise +
+                ", date=" + date +
                 '}';
     }
 }

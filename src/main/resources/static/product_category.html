@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_jqgrid.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:02 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 分类管理</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+
+    <!-- jqgrid-->
+    <link href="css/plugins/jqgrid/ui.jqgridffe4.css?0820" rel="stylesheet">
+
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+
+    <style>
+        /* Additional style to fix warning dialog position */
+
+        #alertmod_table_list_2 {
+            top: 900px !important;
+        }
+    </style>
+
+</head>
+
+<body class="gray-bg">
+
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>添加分类</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-11">
+                            <div class="input-group">
+                                <input id="pcname" type="text" placeholder="请输入分类名称" class="input-sm form-control">
+                                <span
+                                        class="input-group-btn">
+                                        <button id="btn-add" type="button" class="btn btn-sm btn-primary"> 添加</button> </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>全部分类</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm" style="margin: 0 auto;">
+                        <div class="table-responsive col-md-5">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>分类名称</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="all-log">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/plugins/peity/jquery.peity.min.js"></script>
+<script src="js/plugins/jqgrid/i18n/grid.locale-cnffe4.js?0820"></script>
+<script src="js/plugins/jqgrid/jquery.jqGrid.minffe4.js?0820"></script>
+<script src="js/content.min.js?v=1.0.0"></script>
+<script src="js/plugins/layer/layer.min.js"></script>
+<script src="js/demo/layer-demo.min.js"></script>
+
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+
+</body>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#all-log").empty();
+        $.ajax({
+            url: "/category/all", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) {
+                if (result.state == 1000) {
+                    //成功
+                    let list = result.data;
+                    let html = '<h3 class="middle-box">暂无数据</h3>';
+                    if (list.length == 0) {
+                        $("#all-log").append(html);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        html = '<tr id="tr-#{pcId}">' +
+                            '<td>#{pcId}</td>' +
+                            '<td id="name-#{pcId}">#{pcName}</td>' +
+                            '<td>' +
+                            '<button id="update-#{pcId}" class="btn btn-primary btn-circle" type="button"><i class="fa fa-list"></i></button>' +
+                            '<button id="delete-#{pcId}" class="btn btn-warning btn-circle" type="button"><i class="fa fa-times"></i></button>' +
+                            '</td>' +
+                            '</tr>';
+                        html = html.replace(/#{pcName}/g, list[i].pcName);
+                        html = html.replace(/#{pcId}/g, list[i].pcId);
+                        $("#all-log").append(html);
+                        $("#update-" + list[i].pcId).click(function () {
+                            parent.layer.prompt({
+                                title: '更改分类',
+                                formType: 0,//prompt风格，支持0-2
+                                value: list[i].pcName
+                            }, function (values) {
+                                if (values.trim() != list[i].pcName) {
+                                    //ajax请求
+                                    $.ajax({
+                                        url: "/category/update", //请求url
+                                        data: "pcName=" + values + "&pcId=" + list[i].pcId,
+                                        method: "post", //请求方式
+                                        dataType: "json", //返回值类型
+                                        success: function (result) {
+                                            if (result.state == 1000) {
+                                                $("#name-" + list[i].pcId).empty();
+                                                $("#name-" + list[i].pcId).append(values);
+                                            } else
+                                                alert(result.message);
+                                        },
+                                        error: function () {
+                                            alert("未知错误，请重试！");
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                        $("#delete-" + list[i].pcId).click(function () {
+                            $.ajax({
+                                url: "/category/delete", //请求url
+                                data: "pcId=" + list[i].pcId,
+                                method: "post", //请求方式
+                                dataType: "json", //返回值类型
+                                success: function (result) {
+                                    if (result.state == 1000) {
+                                        alert("删除成功");
+                                        $("#tr-" + list[i].pcId).remove();
+                                    } else
+                                        alert(result.message);
+                                },
+                                error: function () {
+                                    alert("未知错误，请重试！");
+                                }
+                            });
+                        });
+                    }
+                }
+            },
+            error: function () {
+                alert("未知错误，请重试！");
+            }
+
+        });
+    });
+    $("#btn-add").click(function () {
+        var pcNname = $("#pcname").val();
+        if (pcNname.trim() == "") {
+            alert("分类名称不能为空");
+        }
+        $.ajax({
+            url: "/category/add", //请求url
+            data: "pcName=" + pcNname,
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) {
+                if (result.state == 1000) {
+                    //成功
+                    location.reload();
+                } else
+                    alert(result.message);
+            },
+            error: function () {
+                alert("未知错误，请重试！");
+            }
+        });
+    });
+</script>
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_jqgrid.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:02 GMT -->
+</html>

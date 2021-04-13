@@ -2,6 +2,7 @@ package com.example.rongfu.mapper;
 
 import com.example.rongfu.entity.Enterprise;
 import com.example.rongfu.entity.User;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -34,4 +35,7 @@ public interface EnterpriseMapper {
 
     @Select("select * from enterprise where userid=#{userid}")
     Enterprise findByUserId(int userid);
+
+    @Delete("delete from enterprise where epid=#{epid}")
+    Integer delete(int epid);
 }

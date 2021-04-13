@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>RF - 出勤管理</title>
+<link rel="shortcut icon" href="favicon.ico">
+<link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+<link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+<link href="css/plugins/iCheck/custom.css" rel="stylesheet">
+<link href="css/animate.min.css" rel="stylesheet">
+<link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>今日未签到</h5>
+                </div>
+                <div class="ibox-content">
+
+                    <table class="table">
+                        <tbody id="not-sign-in">
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>今日已签到</h5>
+                </div>
+                <div class="ibox-content">
+
+                    <table class="table">
+                        <tbody id="sign-in">
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>全部签到记录</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-sm-2 m-b-xs">
+                            <select class="input-sm form-control input-s-sm inline">
+                                <option value="0">请选择</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2 m-b-xs">
+                            <div data-toggle="buttons" class="btn-group">
+                                <label class="btn btn-sm btn-white active">
+                                    <input type="radio" id="option1" name="options">天</label>
+                                <label class="btn btn-sm btn-white">
+                                    <input type="radio" id="option2" name="options">周</label>
+                                <label class="btn btn-sm btn-white">
+                                    <input type="radio" id="option3" name="options">月</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 m-b-xs">
+                            <div class="form-group">
+                                <input readonly class="form-control layer-date" id="hello1">
+                                <label class="laydate-icon inline demoicon"
+                                       onclick="laydate({elem: '#hello1'});"></label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input type="text" placeholder="请输入用户名" class="input-sm form-control"> <span
+                                    class="input-group-btn">
+                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tbody id="all-log">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/plugins/peity/jquery.peity.min.js"></script>
+<script src="js/content.min.js?v=1.0.0"></script>
+<script src="js/plugins/iCheck/icheck.min.js"></script>
+<script src="js/demo/peity-demo.min.js"></script>
+<script src="js/plugins/layer/laydate/laydate.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green",})
+    });
+</script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: "/signIn/todayAllSILog", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#sign-in").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        $("#sign-in").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        console.log(list[i].userId);
+                        let html = '<tr>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 50px;height: 50px"></td>' +
+                            '<td>#{username}</td>' +
+                            '<td>#{date}</td>' +
+                            '</tr>';
+                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
+                        else
+                            html = html.replace(/#{photo}/g, list[i].photo);
+                        html = html.replace(/#{username}/g, list[i].userName);
+                        html = html.replace(/#{userId}/g, list[i].userId);
+                        html = html.replace(/#{date}/g, list[i].date);
+                        $("#sign-in").append(html);
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+        $.ajax({
+            url: "/signIn/todayNotSILog", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#not-sign-in").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        $("#not-sign-in").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        console.log(list[i].userId);
+                        let html = '<tr>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 50px;height: 50px"></td>' +
+                            '<td>#{username}</td>' +
+                            '</tr>';
+                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
+                        else
+                            html = html.replace(/#{photo}/g, list[i].photo);
+                        html = html.replace(/#{username}/g, list[i].userName);
+                        html = html.replace(/#{userId}/g, list[i].userId);
+                        $("#not-sign-in").append(html);
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+    $.ajax({
+        url: "/signIn/allSignInLog", //请求url
+        data: "",
+        method: "post", //请求方式
+        dataType: "json", //返回值类型
+        success: function (result) { //服务器成功返回时，执行的匿名函数
+            if (result.state == 1000) {
+                $("#all-log").empty();
+                let list = result.data;
+                console.log("count=" + list.length);
+                if (list.length == 0) {
+                    let h = '<h3 class="middle-box">暂无数据</h3>';
+                    $("#all-log").append(h);
+                    return;
+                }
+                for (let i = 0; i < list.length; i++) {
+                    console.log(list[i].userId);
+                    let html = '<tr>' +
+                        '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 30px;height: 30px"></td>' +
+                        '<td>#{username}</td>' +
+                        '<td>#{date}</td>' +
+                        '</tr>';
+                    if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
+                    else
+                        html = html.replace(/#{photo}/g, list[i].photo);
+                    html = html.replace(/#{username}/g, list[i].userName);
+                    html = html.replace(/#{date}/g, list[i].date);
+                    $("#all-log").append(html);
+                }
+            } else {
+                alert(result.message);
+            }
+        }
+    });
+</script>
+
+</html>
