@@ -1,5 +1,7 @@
 package com.example.rongfu.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface IUploadImgService {
-    void upload(String path,int userId);
+    void upload(MultipartFile fil);
 }
