@@ -15,7 +15,7 @@ public interface ProductMapper {
     @Update("update product set pname=#{pName}," +
             "photo=#{photo}," +
             "addTime=#{addTime},price=#{price}," +
-            "content=#{content},userId=#{userId} where productid=#{producrId}")
+            "content=#{content},userId=#{userId} where productid=#{productId}")
     Integer update(Product product);
 
     @Delete("delete from product where productid=#{productId}")

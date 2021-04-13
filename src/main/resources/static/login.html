@@ -80,7 +80,6 @@
             dataType: "json", //返回值类型
             success: function(result){ //服务器成功返回时，执行的匿名函数
                 if( result.state == 1000){
-                    alert("登录成功！");
                     location.href = "index.html"; //跳转到登录页
                 } else {
                     alert(result.message);

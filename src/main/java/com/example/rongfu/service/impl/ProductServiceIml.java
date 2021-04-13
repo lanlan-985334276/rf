@@ -30,7 +30,8 @@ public class ProductServiceIml implements IProductService {
 
     @Override
     public Product update(Product product) {
-        if (productMapper.delete(product.getProductId()) != 1)
+        System.out.println(product);
+        if (productMapper.update(product) != 1)
             throw new FailedException("更新失败，未知更新错误，请联系管理员！");
         return product;
     }

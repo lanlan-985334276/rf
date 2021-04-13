@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class Product {
     private int productId;
-    private String pname;
+    private String pName;
     private int pcId;
     private String photo;
     private Timestamp addTime;
@@ -23,12 +23,13 @@ public class Product {
         this.productId = productId;
     }
 
-    public String getPname() {
-        return pname;
+
+    public String getpName() {
+        return pName;
     }
 
-    public void setPname(String pname) {
-        this.pname = pname;
+    public void setpName(String pName) {
+        this.pName = pName;
     }
 
     public int getPcId() {
@@ -83,7 +84,7 @@ public class Product {
     public String toString() {
         return "Product{" +
                 "productId=" + productId +
-                ", name='" + pname + '\'' +
+                ", pName='" + pName + '\'' +
                 ", pcId=" + pcId +
                 ", photo='" + photo + '\'' +
                 ", addTime=" + addTime +

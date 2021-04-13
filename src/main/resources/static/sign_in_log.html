@@ -121,15 +121,11 @@
 <script src="js/plugins/iCheck/icheck.min.js"></script>
 <script src="js/demo/peity-demo.min.js"></script>
 <script src="js/plugins/layer/laydate/laydate.js"></script>
-<script>
-    $(document).ready(function () {
-        $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green",})
-    });
-</script>
 <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
 </body>
 <script type="text/javascript">
     $(document).ready(function () {
+        $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green"});
         $.ajax({
             url: "/signIn/todayAllSILog", //请求url
             data: "",
@@ -198,41 +194,42 @@
                 }
             }
         });
-    });
-    $.ajax({
-        url: "/signIn/allSignInLog", //请求url
-        data: "",
-        method: "post", //请求方式
-        dataType: "json", //返回值类型
-        success: function (result) { //服务器成功返回时，执行的匿名函数
-            if (result.state == 1000) {
-                $("#all-log").empty();
-                let list = result.data;
-                console.log("count=" + list.length);
-                if (list.length == 0) {
-                    let h = '<h3 class="middle-box">暂无数据</h3>';
-                    $("#all-log").append(h);
-                    return;
+        $.ajax({
+            url: "/signIn/allSignInLog", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#all-log").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        $("#all-log").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        console.log(list[i].userId);
+                        let html = '<tr>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 30px;height: 30px"></td>' +
+                            '<td>#{username}</td>' +
+                            '<td>#{date}</td>' +
+                            '</tr>';
+                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
+                        else
+                            html = html.replace(/#{photo}/g, list[i].photo);
+                        html = html.replace(/#{username}/g, list[i].userName);
+                        html = html.replace(/#{date}/g, list[i].date);
+                        $("#all-log").append(html);
+                    }
+                } else {
+                    alert(result.message);
                 }
-                for (let i = 0; i < list.length; i++) {
-                    console.log(list[i].userId);
-                    let html = '<tr>' +
-                        '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 30px;height: 30px"></td>' +
-                        '<td>#{username}</td>' +
-                        '<td>#{date}</td>' +
-                        '</tr>';
-                    if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
-                    else
-                        html = html.replace(/#{photo}/g, list[i].photo);
-                    html = html.replace(/#{username}/g, list[i].userName);
-                    html = html.replace(/#{date}/g, list[i].date);
-                    $("#all-log").append(html);
-                }
-            } else {
-                alert(result.message);
             }
-        }
+        });
     });
+
 </script>
 
 </html>

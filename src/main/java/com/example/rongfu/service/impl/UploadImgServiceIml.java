@@ -34,13 +34,14 @@ public class UploadImgServiceIml implements IUploadImgService {
     public String upload(MultipartFile file) {
         String fileName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
         //设置文件上传路径
-        String filePath = "/uploadImg/";
+        String filePath = "D://EndIDea/upload/";
         try {
-            org.apache.commons.io.FileUtils.copyInputStreamToFile(file.getInputStream(), new File(filePath + fileName));
+//            org.apache.commons.io.FileUtils.copyInputStreamToFile(file.getInputStream(), new File(filePath + fileName));
+            FileUtils.uploadFile(file.getBytes(), filePath, fileName);
         } catch (Exception e) {
             e.printStackTrace();
             throw new FailedException("上传失败，未知错误，请联系管理员！");
         }
-        return null;
+        return "/uploadImg/" + fileName;
     }
 }
