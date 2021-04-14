@@ -2,6 +2,7 @@ package com.example.rongfu.service.impl;
 
 import com.example.rongfu.entity.Plan;
 import com.example.rongfu.entity.User;
+import com.example.rongfu.mapper.AdminMapper;
 import com.example.rongfu.mapper.PlanMapper;
 import com.example.rongfu.mapper.UserMapper;
 import com.example.rongfu.service.IPlanService;
@@ -21,6 +22,8 @@ public class PlanServiceImpl implements IPlanService {
     private PlanMapper planMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private AdminMapper adminMapper;
 
     @Override
     public void add(Plan plan) {
@@ -30,6 +33,7 @@ public class PlanServiceImpl implements IPlanService {
             progress += "-0";
         }
         plan.setProgress(progress);
+        plan.setEpId(adminMapper.findByUserId(plan.getUserId()).getEpId());
         if (planMapper.insert(plan) != 1)
             throw new FailedException("添加失败，未知插入错误，请联系管理员！");
     }

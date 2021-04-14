@@ -20,6 +20,8 @@
     <link href="css/animate.min.css" rel="stylesheet">
     <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
 
+    <script src="js/plugins/layer/laydate/laydate.js"></script>
+
 
 </head>
 
@@ -103,8 +105,12 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-sm-8" id="staffs-img">
-
+                                <label class="col-sm-3 control-label"></label>
+                                <div class="col-sm-5">
+                                    <table class="table">
+                                        <tbody id="staffs-img">
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -132,7 +138,7 @@
 
     function getStaffs() {
         $.ajax({
-            url: "/user/queryStaff", //请求url
+            url: "/users/queryStaff", //请求url
             data: "",
             method: "post", //请求方式
             dataType: "json", //返回值类型
@@ -161,16 +167,15 @@
             dataType: "json", //返回值类型
             success: function (result) {
                 if (result.state == 1000) {
-                    $("#all-product").empty();
+                    $("#all").empty();
                     let list = result.data;
                     console.log("count=" + list.length);
                     if (list.length == 0) {
                         let h = '<h3 class="middle-box">暂无数据</h3>';
-                        $("#all-product").append(h);
+                        $("#all").append(h);
                         return;
                     }
                     for (let i = 0; i < list.length; i++) {
-                        console.log(list[i].userId);
                         let html = '<tr>' +
                             '<td class="project-status">' +
                             '</td>' +
@@ -189,9 +194,8 @@
                             '<a id="btn-delete-' + list[i].planId + '" href="#" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i>' +
                             ' 删除 </a>' +
                             '</td>' +
-                            '</tr>' +
-                            '</tbody>';
-                        $("#all-product").append(html);
+                            '</tr>';
+                        $("#all").append(html);
                         $("#btn-delete-" + list[i].planId).click(function () {
                             $.ajax({
                                 url: "/user/delete", //请求url
@@ -263,20 +267,26 @@
         $("#staffs").val("");
         $("#progress").val("");
         $("#staffs-img").empty();
+        getStaffs();
     });
     $("#add-userId").change(function () {
         var userId = $("#add-userId").val();
         $.ajax({
-            url: "/user/findByUserId", //请求url
-            data: "",
+            url: "/users/findByUserId", //请求url
+            data: "userId=" + userId,
             method: "post", //请求方式
             dataType: "json", //返回值类型
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#staffs-img").append('' +
-                        '<img src="' + result.data.photo + '" class="img-circle" style="width: 30px;height: 30px;">' +
-                        '');
+                        '<tr>' +
+                        '<td><img src="' + result.data.photo + '" class="img-circle" style="width: 30px;height: 30px;">' +
+                        '</td>' +
+                        '<td>' + result.data.userName + '</td>' +
+                        '</tr>');
                     $("#option-" + userId).remove();
+                    var staffs = $("#staffs").val();
+                    $("#staffs").val(staffs == "" ? result.data.userId : (staffs + "-" + result.data.userId))
                 } else {
                     alert(result.message);
                 }
