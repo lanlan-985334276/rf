@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class SignInServiceIml implements ISignInService {
+public class SignInServiceImpl implements ISignInService {
 
     @Autowired
     private SignInMapper signInMapper;
@@ -42,6 +42,7 @@ public class SignInServiceIml implements ISignInService {
             e.printStackTrace();
             throw new FailedException("未知错误，请联系管理员！");
         }
+        System.out.println(list);
         return list;
     }
 
@@ -59,6 +60,7 @@ public class SignInServiceIml implements ISignInService {
             e.printStackTrace();
             throw new FailedException("未知错误，请联系管理员！");
         }
+        System.out.println(list);
         return list;
     }
 

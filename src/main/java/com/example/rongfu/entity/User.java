@@ -57,7 +57,36 @@ public class User {
 
     private Timestamp date;
 
+    private int adminId;
+    private int staffId;
+
+    private int state;
+
     public User() {
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public int getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(int adminId) {
+        this.adminId = adminId;
+    }
+
+    public int getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(int staffId) {
+        this.staffId = staffId;
     }
 
     public int getUserId() {
@@ -198,6 +227,8 @@ public class User {
                 ", isAdmin=" + isAdmin +
                 ", isEnterprise=" + isEnterprise +
                 ", date=" + date +
+                ", adminId=" + adminId +
+                ", staffId=" + staffId +
                 '}';
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CategoryServiceIml implements ICategoryService {
+public class CategoryServiceImpl implements ICategoryService {
 
     @Autowired
     private PCategoryMapper categoryMapper;

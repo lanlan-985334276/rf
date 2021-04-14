@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 权限管理</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>管理员</h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>管理员</th>
+                            <th></th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="all">
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>其他员工</h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table">
+                        <tbody id="staff">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>员工</th>
+                            <th></th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/plugins/peity/jquery.peity.min.js"></script>
+<script src="js/content.min.js?v=1.0.0"></script>
+<script src="js/plugins/iCheck/icheck.min.js"></script>
+<script src="js/demo/peity-demo.min.js"></script>
+<script src="js/plugins/layer/laydate/laydate.js"></script>
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: "/admin/all", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#all").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3>暂无数据</h3>';
+                        $("#all").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        let html = '<tr>' +
+                            '<td>' + list[i].adminId + '</td>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="'+list[i].photo+'" style="width: 50px;height: 50px; margin-right: 10px"></td>' +
+                            '<td>'+list[i].userName+'</td>' +
+                            '<td><button id="btn-delete-' + list[i].adminId + '" type="button" class="btn btn-outline btn-danger">删除</button></td>' +
+                            '</tr>';
+                        $("#all").append(html);
+                        $("#btn-delete-" + list[i].adminId).click(function () {
+                            $.ajax({
+                                url: "/admin/delete", //请求url
+                                data: "adminId=" + list[i].adminId,
+                                method: "post", //请求方式
+                                dataType: "json", //返回值类型
+                                success: function (result) {
+                                    if (result.state == 1000) {
+                                        alert("删除管理员成功！");
+                                        location.reload();
+                                    } else alert(result.message);
+                                }
+                            });
+                        });
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+        $.ajax({
+            url: "/admin/other", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#staff").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3>暂无数据</h3>';
+                        $("#staff").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        let html = '<tr>' +
+                            '<td>' + list[i].userId + '</td>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="'+list[i].photo+'" style="width: 50px;height: 50px; margin-right: 10px"></td>' +
+                            '<td>'+list[i].userName+'</td>' +
+                            '<td><button id="btn-add-'+list[i].userId+'" type="button" class="btn btn-outline btn-success" >设置为管理员</button></td>' +
+                            '</tr>';
+                        $("#staff").append(html);
+                        $("#btn-add-" + list[i].userId).click(function () {
+                            $.ajax({
+                                url: "/admin/add", //请求url
+                                data: "tUserId=" + list[i].userId,
+                                method: "post", //请求方式
+                                dataType: "json", //返回值类型
+                                success: function (result) {
+                                    if (result.state == 1000) {
+                                        alert("添加管理员成功！");
+                                        location.reload();
+                                    } else alert(result.message);
+                                }
+                            });
+                        });
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+
+</script>
+
+</html>

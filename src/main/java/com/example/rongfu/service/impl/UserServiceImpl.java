@@ -32,7 +32,30 @@ public class UserServiceImpl implements IUserService {
     private StaffMapper staffMapper;
 
     @Override
-    public void reg(String username, String password, String code, String eqName) {
+    public void regEp(String username, String password, String code, String eqName) {
+        User result = reg(username, password, code);
+        //判断企业是否已注册
+        if (enterpriseMapper.findByName(eqName) != null)
+            throw new UserNameErrorException("注册失败，企业已注册！");
+        Enterprise enterprise = new Enterprise();
+        enterprise.setEpName(eqName);
+        enterprise.setUserId(result.getUserId());
+        enterprise.setTime(new Timestamp(new Date().getTime()));
+        //调用userMapper的insert方法进行插入
+        Integer rows = userMapper.insert(result);
+        //若影响行数不为1，则抛出InsertException
+        if (rows != 1) {
+            throw new InsertException("注册失败，未知插入错误！请联系管理员!");
+        }
+        rows = enterpriseMapper.insert(enterprise);
+        if (rows != 1) {
+            userMapper.delete(result.getUserId());
+            throw new FailedException("注册失败，未知插入错误！请联系管理员!");
+        }
+    }
+
+    @Override
+    public User reg(String username, String password, String code) {
         User result = null;
         if (StringUtils.isPhone(username)) {
             result = userMapper.findByPhone(username);
@@ -53,34 +76,10 @@ public class UserServiceImpl implements IUserService {
         VerificationCode vCode = codeMapper.findByUsername(username);
         if (vCode == null || !vCode.getVerificationCode().equals(code))
             throw new VerificationCodeErrorException("验证码错误！");
-        //判断企业是否已注册
-        if (enterpriseMapper.findByName(eqName) != null)
-            throw new UserNameErrorException("注册失败，企业已注册！");
-        Enterprise enterprise = new Enterprise();
-        enterprise.setEpName(eqName);
-        enterprise.setUserId(result.getUserId());
-        enterprise.setTime(new Timestamp(new Date().getTime()));
-        System.out.println(vCode);
         codeMapper.delete(vCode.getVcId());
         result.setUserName(username);
         result.setPassword(password);
-        //调用userMapper的insert方法进行插入
-        Integer rows = userMapper.insert(result);
-        //若影响行数不为1，则抛出InsertException
-        if (rows != 1) {
-            throw new InsertException("注册失败，未知插入错误！请联系管理员!");
-        }
-        rows = enterpriseMapper.insert(enterprise);
-        if (rows != 1) {
-            userMapper.delete(result.getUserId());
-            throw new FailedException("注册失败，未知插入错误！请联系管理员!");
-        }
-        rows = adminMapper.insert(result.getUserId());
-        if (rows != 1) {
-            enterpriseMapper.delete(enterpriseMapper.findByUserId(result.getUserId()).getEpId());
-            userMapper.delete(result.getUserId());
-            throw new FailedException("注册失败，未知插入错误！请联系管理员!");
-        }
+        return result;
     }
 
     @Override
@@ -206,5 +205,10 @@ public class UserServiceImpl implements IUserService {
         if (enterprise == null)
             throw new FailedException("未知错误，请重新登录！");
         return staffMapper.findByEnterpriseId2(enterprise.getEpId(), "%" + username + "%");
+    }
+
+    @Override
+    public User findByUserId(int userId) {
+        return userMapper.findByUserId(userId);
     }
 }

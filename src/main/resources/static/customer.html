@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <title>RF - 商品管理</title>
+    <title>RF - 客户管理</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
 
@@ -34,7 +34,7 @@
         <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>全部产品</h5>
+                    <h5>全部客户</h5>
                 </div>
                 <div class="ibox-content">
                     <div class="row">
@@ -56,7 +56,7 @@
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input type="text" placeholder="请输入产品名" class="input-sm form-control"> <span
+                                <input type="text" placeholder="请输入客户名" class="input-sm form-control"> <span
                                     class="input-group-btn">
                                         <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
                             </div>
@@ -66,15 +66,16 @@
                         <thead>
                         <tr>
                             <th>序号</th>
-                            <th>封面</th>
-                            <th>产品名称</th>
-                            <th>产品分类</th>
-                            <th>产品价格</th>
-                            <th>发布时间</th>
+                            <th>logo</th>
+                            <th>公司名称</th>
+                            <th>公司地址</th>
+                            <th>联系人</th>
+                            <th>电话</th>
+                            <th>添加时间</th>
                             <th>操作</th>
                         </tr>
                         </thead>
-                        <tbody id="all-product">
+                        <tbody id="all-customer">
                         </tbody>
                     </table>
 
@@ -91,28 +92,37 @@
                     <div class="col-sm-12">
                         <form class="form-horizontal m-t" id="form-add">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">产品名称：</label>
+                                <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-8">
-                                    <input id="pName" name="pName" class="form-control" type="text">
+                                    <input id="cName" name="cName" class="form-control" type="text">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">产品价格：</label>
+                                <label class="col-sm-3 control-label">地址：</label>
                                 <div class="col-sm-8">
-                                    <input id="price" name="price" class="form-control" type="text"
+                                    <input id="address" name="address" class="form-control" type="text"
                                            aria-required="true"
                                            aria-invalid="false" class="valid">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">产品分类：</label>
+                                <label class="col-sm-3 control-label">电话：</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control m-b" name="pcId" id="add-pcId">
-                                    </select>
+                                    <input id="phone" name="phone" class="form-control" type="text"
+                                           aria-required="true"
+                                           aria-invalid="false" class="valid">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">产品封面：</label>
+                                <label class="col-sm-3 control-label">联系人：</label>
+                                <div class="col-sm-8">
+                                    <input id="contact" name="contact" class="form-control" type="text"
+                                           aria-required="true"
+                                           aria-invalid="false" class="valid">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">公司logo：</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
                                         <input id="photo" name="photo" type="hidden">
@@ -128,7 +138,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">发布时间：</label>
+                                <label class="col-sm-3 control-label">添加时间：</label>
                                 <div class="col-sm-8">
                                     <input id="addTime" name="time" class="form-control layer-date"
                                            placeholder="YYYY-MM-DD hh:mm:ss"
@@ -137,7 +147,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">产品描述内容：</label>
+                                <label class="col-sm-3 control-label">详情：</label>
                                 <div class="col-sm-8">
                                     <input id="content" name="content" class="form-control" type="text"
                                            aria-required="true"
@@ -168,81 +178,59 @@
 
 </body>
 <script type="text/javascript">
-    var productId = undefined;
-
-    function getCategory() {
-        $("#add-pcId").empty();
-        $("#all-pcId").empty();
-        $.ajax({
-            url: "/category/all",
-            data: "",
-            method: "post",
-            dataType: "json",
-            success: function (result) {
-                if (result.state == 1000) {
-                    let list = result.data;
-                    var option1 = '<option>' + (list.length > 0 ? '请选择' : '暂无数据') + '</option>';
-                    $("#add-pcId").append(option1);
-                    $("#all-pcId").append(option1);
-                    for (let i = 0; i < list.length; i++) {
-                        $("#add-pcId").append('<option value="' + list[i].pcId + '">' + list[i].pcName + '</option>');
-                        $("#all-pcId").append('<option value="' + list[i].pcId + '">' + list[i].pcName + '</option>');
-                    }
-                } else alert(result.message);
-            }
-        });
-    }
+    var customerId = undefined;
 
     $(document).ready(function () {
-        getCategory();
         $.ajax({
-            url: "/product/all", //请求url
+            url: "/customer/all", //请求url
             data: "",
             method: "post", //请求方式
             dataType: "json", //返回值类型
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
-                    $("#all-product").empty();
+                    $("#all-customer").empty();
                     let list = result.data;
                     console.log("count=" + list.length);
                     if (list.length == 0) {
                         let h = '<h3 class="middle-box">暂无数据</h3>';
-                        $("#all-product").append(h);
+                        $("#all-customer").append(h);
                         return;
                     }
                     for (let i = 0; i < list.length; i++) {
                         console.log(list[i].userId);
                         let html = '<tr>' +
-                            '<td>' + list[i].productId + '</td>' +
-                            '<td><img src="' + list[i].photo + '" style="width: 30px;height: 30px"></td>' +
-                            '<td>' + list[i].pName + '</td>' +
-                            '<td>' + list[i].pcId + '</td>' +
-                            '<td>' + list[i].price + '</td>' +
+                            '<td>' + list[i].customerId + '</td>' +
+                            '<td><img src="' + list[i].photo + '" class="img-circle" style="width: 30px;height: 30px"></td>' +
+                            '<td>' + list[i].cName + '</td>' +
+                            '<td>' + list[i].address + '</td>' +
+                            '<td>' + list[i].contact + '</td>' +
+                            '<td>' + list[i].phone + '</td>' +
                             '<td>' + list[i].addTime + '</td>' +
                             '<td>' +
-                            '<a id="btn-edit-' + list[i].productId + '" data-toggle="modal" href="product.html#modal-add"><button type="button" class="btn btn-outline btn-success" >修改</button></a>' +
-                            '<button id="btn-delete-' + list[i].productId + '" type="button" class="btn btn-outline btn-danger">删除</button>' +
+                            '<a id="btn-edit-' + list[i].customerId + '" data-toggle="modal" href="product.html#modal-add"><button type="button" class="btn btn-outline btn-success" >修改</button></a>' +
+                            '<button id="btn-delete-' + list[i].customerId + '" type="button" class="btn btn-outline btn-danger">删除</button>' +
                             '</td>' +
                             '</tr>';
-                        $("#all-product").append(html);
-                        $("#btn-edit-" + list[i].productId).click(function () {
-                            console.log("修改！！！" + list[i].productId);
-                            $("#pName").val(list[i].pName);
-                            $("#price").val(list[i].price);
+                        $("#all-customer").append(html);
+                        $("#btn-edit-" + list[i].customerId).click(function () {
+                            console.log("修改！！！" + list[i].customerId);
+                            $("#cName").val(list[i].cName);
+                            $("#address").val(list[i].address);
                             $("#addTime").val(list[i].addTime);
-                            $("#add-pcId").val(list[i].pcId);
+                            $("#phone").val(list[i].phone);
                             $("#photo").val(list[i].photo);
+                            $("#contact").val(list[i].contact);
                             $("#img-photo").empty();
                             $("#img-photo").append('' +
-                                '<img src="' + list[i].photo + '" style="width: 300px;">' +
+                                '<img src="' + list[i].photo + '" class="img-circle" style="width: 300px;">' +
                                 '');
                             $("#content").val(list[i].content);
-                            productId = list[i].productId;
+                            customerId = list[i].customerId;
                         });
-                        $("#btn-delete-" + list[i].productId).click(function () {
+                        $("#btn-delete-" + list[i].customerId).click(function () {
                             $.ajax({
-                                url: "/product/delete",
-                                data: "productId=" + list[i].productId,
+                                url: "/customer/delete",
+                                data: "customerId=" + list[i].customerId,
                                 method: "post",
                                 dataType: "json",
                                 success: function (result) {
@@ -271,7 +259,7 @@
         fileReader.onload = function () {  // 等待文件阅读器读取完毕再渲染图片
             $("#img-photo").empty();
             $("#img-photo").append('' +
-                '<img src=' + fileReader.result + ' style="width: 300px;">' +
+                '<img src="' + fileReader.result + '" class="img-circle"  style="width: 150px; height: 150px">' +
                 '');
         };
         var formData = new FormData($("#form-add")[0]);
@@ -294,9 +282,9 @@
 
     });
     $("#btn-add").click(function () {
-        var name = $("#pName").val();
+        var name = $("#name").val();
         if (name == "") {
-            alert("产品名称不能为空！");
+            alert("名称不能为空！");
             return;
         }
         var price = $("#price").val();
@@ -304,34 +292,39 @@
             alert("产品价格不能为空！");
             return;
         }
-        var pcId = $("#add-pcId").val();
-        if (pcId == "") {
-            alert("请选择产品分类！");
+        var phone = $("#phone").val();
+        if (phone == "") {
+            alert("电话不能为空！");
             return;
         }
         var photo = $("#photo").val();
         if (photo == "") {
-            alert("产品封面不能为空！");
+            alert("公司logo不能为空！");
             return;
         }
         var addTime = $("#addTime").val();
         if (addTime == "") {
-            alert("发布时间不能为空！")
+            alert("添加时间不能为空！")
             return;
         }
         var content = $("#content").val();
         if (content == "") {
-            alert("产品描述不能为空！")
+            alert("详情不能为空！")
+            return;
+        }
+        var contact = $("#contact").val();
+        if (contact == "") {
+            alert("联系人不能为空！")
             return;
         }
         var url;
-        if (productId == undefined)
-            url = "/product/add";
-        else url = "/product/update";
+        if (customerId == undefined)
+            url = "/customer/add";
+        else url = "/customer/update";
         console.log(url)
         $.ajax({
             url: url,
-            data: $("#form-add").serialize() + (productId == undefined ? "" : "&productId=" + productId),
+            data: $("#form-add").serialize() + (customerId == undefined ? "" : "&customerId=" + customerId),
             method: "post", //请求方式
             dataType: "json", //返回值类型
             success: function (result) {
@@ -346,12 +339,13 @@
 
     });
     $("#a-add").click(function () {
-        productId = undefined;
-        $("#pName").val("");
-        $("#price").val("");
+        customerId = undefined;
+        $("#cName").val("");
+        $("#contact").val("");
         $("#addTime").val("");
-        $("#add-pcId").val("");
+        $("#phone").val("");
         $("#photo").val("");
+        $("#address").val("");
         $("#img-photo").empty();
         $("#content").val("");
     });

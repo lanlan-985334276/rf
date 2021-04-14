@@ -13,88 +13,278 @@
     <meta name="keywords" content="">
     <meta name="description" content="">
 
-    <link rel="shortcut icon" href="favicon.ico"> <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
     <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
 
     <link href="css/animate.min.css" rel="stylesheet">
     <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
-    
+
 
 </head>
 
 <body class="gray-bg">
 
-    <div class="wrapper wrapper-content animated fadeInUp">
-        <div class="row">
-            <div class="col-sm-12">
-
-                <div class="ibox">
-                    <div class="ibox-title">
-                        <h5>所有项目</h5>
-                        <div class="ibox-tools">
-                            <a href="projects.html" class="btn btn-primary btn-xs">创建新项目</a>
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>所有计划</h5>
+                    <div class="ibox-tools">
+                        <a id="a-add" data-toggle="modal" href="projects.html#modal-add" class="btn btn-primary btn-xs">发布新计划</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-1">
+                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i
+                                    class="fa fa-refresh"></i> 刷新
+                            </button>
+                        </div>
+                        <div class="col-md-11">
+                            <div class="input-group">
+                                <input type="text" placeholder="请输入计划名" class="input-sm form-control"> <span
+                                    class="input-group-btn">
+                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="ibox-content">
-                        <div class="row m-b-sm m-t-sm">
-                            <div class="col-md-1">
-                                <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i class="fa fa-refresh"></i> 刷新</button>
-                            </div>
-                            <div class="col-md-11">
-                                <div class="input-group">
-                                    <input type="text" placeholder="请输入项目名称" class="input-sm form-control"> <span class="input-group-btn">
-                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="project-list">
+                    <div class="project-list">
 
-                            <table class="table table-hover">
-                                <tbody>
-                                    <tr>
-                                        <td class="project-status">
-                                            <span class="label label-primary">进行中</span>
-                                        </td>
-                                        <td class="project-title">
-                                            <a href="project_detail.html">LIKE－一款能够让用户快速获得认同感的兴趣社交应用</a>
-                                            <br/>
-                                            <small>创建于 2014.08.15</small>
-                                        </td>
-                                        <td class="project-completion">
-                                                <small>当前进度： 48%</small>
-                                                <div class="progress progress-mini">
-                                                    <div style="width: 48%;" class="progress-bar"></div>
-                                                </div>
-                                        </td>
-                                        <td class="project-people">
-                                            <a href="projects.html"><img alt="image" class="img-circle" src="img/a3.jpg"></a>
-                                            <a href="projects.html"><img alt="image" class="img-circle" src="img/a1.jpg"></a>
-                                            <a href="projects.html"><img alt="image" class="img-circle" src="img/a2.jpg"></a>
-                                            <a href="projects.html"><img alt="image" class="img-circle" src="img/a4.jpg"></a>
-                                            <a href="projects.html"><img alt="image" class="img-circle" src="img/a5.jpg"></a>
-                                        </td>
-                                        <td class="project-actions">
-                                            <a href="projects.html#" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> 查看 </a>
-                                            <a href="projects.html#" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i> 编辑 </a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <table class="table table-hover">
+                            <tbody id="all">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-    <script src="js/jquery.min.js?v=2.1.4"></script>
-    <script src="js/bootstrap.min.js?v=3.3.6"></script>
-    <script src="js/content.min.js?v=1.0.0"></script>
-    <script>
-       $(document).ready(function(){$("#loading-example-btn").click(function(){btn=$(this);simpleLoad(btn,true);simpleLoad(btn,false)})});function simpleLoad(btn,state){if(state){btn.children().addClass("fa-spin");btn.contents().last().replaceWith(" Loading")}else{setTimeout(function(){btn.children().removeClass("fa-spin");btn.contents().last().replaceWith(" Refresh")},2000)}};
-    </script>
-    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
-    </body>
+    </div>
+</div>
+<div id="modal-add" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-horizontal m-t" id="form-add">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">计划标题：</label>
+                                <div class="col-sm-8">
+                                    <input id="title" name="title" class="form-control" type="text">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">计划内容：</label>
+                                <div class="col-sm-8">
+                                    <input id="content" name="content" class="form-control" type="text"
+                                           aria-required="true"
+                                           aria-invalid="false" class="valid">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">发布时间：</label>
+                                <div class="col-sm-8">
+                                    <input id="addTime" name="time" class="form-control layer-date"
+                                           placeholder="YYYY-MM-DD hh:mm:ss"
+                                           onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                                    <label class="laydate-icon"></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">参与员工：</label>
+                                <div class="col-sm-8">
+                                    <input id="staffs" name="staffs" type="hidden">
+                                    <select class="form-control m-b" id="add-userId">
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8" id="staffs-img">
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8" id="progress">
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-sm-offset-3">
+                                    <button id="btn-add" class="btn btn-primary" type="button">确定</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/content.min.js?v=1.0.0"></script>
+<script>
+    var planId = undefined;
+
+    function getStaffs() {
+        $.ajax({
+            url: "/user/queryStaff", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#add-userId").empty();
+                    let list = result.data;
+                    var option1 = '<option>' + (list.length > 0 ? '请选择' : '暂无数据') + '</option>';
+                    $("#add-userId").append(option1);
+                    for (let i = 0; i < list.length; i++) {
+                        $("#add-userId").append('<option id="option-' + list[i].userId + '" value="' + list[i].userId + '">' + list[i].userName + '</option>');
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        getStaffs();
+        $.ajax({
+            url: "/plan/all",
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) {
+                if (result.state == 1000) {
+                    $("#all-product").empty();
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        $("#all-product").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        console.log(list[i].userId);
+                        let html = '<tr>' +
+                            '<td class="project-status">' +
+                            '</td>' +
+                            '<td class="project-title">' +
+                            '<a href="#">' + list[i].title + '</a>' +
+                            '<br/>' +
+                            '<small>创建于 ' + list[i].addTime + '</small>' +
+                            '</td>' +
+                            '<td class="project-completion">' +
+                            '<small>当前进度： ' + list[i].progressNum + '%</small>' +
+                            '<div class="progress progress-mini">' +
+                            '<div style="width: ' + list[i].progressNum + '%;" class="progress-bar"></div>' +
+                            '</div>' +
+                            '</td>' +
+                            '<td class="project-actions">' +
+                            '<a id="btn-delete-' + list[i].planId + '" href="#" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i>' +
+                            ' 删除 </a>' +
+                            '</td>' +
+                            '</tr>' +
+                            '</tbody>';
+                        $("#all-product").append(html);
+                        $("#btn-delete-" + list[i].planId).click(function () {
+                            $.ajax({
+                                url: "/user/delete", //请求url
+                                data: "planId=" + list[i].planId,
+                                method: "post", //请求方式
+                                dataType: "json", //返回值类型
+                                success: function (result) { //服务器成功返回时，执行的匿名函数
+                                    if (result.state == 1000) {
+                                        alert("删除成功！");
+                                        location.reload();
+                                    } else {
+                                        alert(result.message);
+                                    }
+                                }
+                            });
+                        });
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+    $("#loading-example-btn").click(function () {
+        location.reload();
+    });
+    $("#btn-add").click(function () {
+        var name = $("#title").val();
+        if (name == "") {
+            alert("计划标题不能为空！");
+            return;
+        }
+        var content = $("#content").val();
+        if (content == "") {
+            alert("计划内容不能为空！");
+            return;
+        }
+        var addTime = $("#addTime").val();
+        if (addTime == "") {
+            alert("发布时间不能为空！")
+            return;
+        }
+        var staffs = $("#staffs").val();
+        if (staffs == "") {
+            alert("请选择参与员工！")
+            return;
+        }
+        $.ajax({
+            url: "/plan/add",
+            data: $("#form-add").serialize(),
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) {
+                if (result.state == 1000) {
+                    $("#modal-add").modal('hide');
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+
+    });
+    $("#a-add").click(function () {
+        planId = undefined;
+        $("#title").val("");
+        $("#content").val("");
+        $("#addTime").val("");
+        $("#staffs").val("");
+        $("#progress").val("");
+        $("#staffs-img").empty();
+    });
+    $("#add-userId").change(function () {
+        var userId = $("#add-userId").val();
+        $.ajax({
+            url: "/user/findByUserId", //请求url
+            data: "",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#staffs-img").append('' +
+                        '<img src="' + result.data.photo + '" class="img-circle" style="width: 30px;height: 30px;">' +
+                        '');
+                    $("#option-" + userId).remove();
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+</script>
+</body>
 
 <!-- Mirrored from www.zi-han.net/theme/hplus/projects.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:44 GMT -->
 </html>

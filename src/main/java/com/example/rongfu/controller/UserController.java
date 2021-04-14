@@ -29,7 +29,7 @@ public class UserController extends BaseController {
     //方法的返回值，先转换成json格式，再进行响应）
     //@ResponseBody
     JsonResult<Void> reg(String username, String password, String code, String eqName) {
-        userService.reg(username, password, code, eqName);
+        userService.regEp(username, password, code, eqName);
         return new JsonResult<>(OK);
     }
 
@@ -81,6 +81,11 @@ public class UserController extends BaseController {
     @RequestMapping("/queryStaff")
     JsonResult<List<User>> queryStaff(String username, HttpSession session) {
         int userId = Integer.valueOf(session.getAttribute("userId").toString());
-        return new JsonResult<>(OK, username!=null ? userService.queryStaff2(userId, username) : userService.queryStaff(userId));
+        return new JsonResult<>(OK, username != null ? userService.queryStaff2(userId, username) : userService.queryStaff(userId));
+    }
+
+    @RequestMapping("/findByUserId")
+    JsonResult<User> queryStaff(int userId) {
+        return new JsonResult<>(OK, userService.findByUserId(userId));
     }
 }

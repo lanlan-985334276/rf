@@ -14,15 +14,15 @@ import java.util.List;
 @Mapper
 public interface SignInMapper {
 
-    @Insert("insert into sign(staffid,date) values(#{staffId},#{date})")
+    @Insert("insert into sign_in(staffid,date) values(#{staffId},#{date})")
     Integer insert(SignIn signIn);
 
-    @Select("select user.*,sign_in.date from staff,sign_in,user where staff.epid=#{epid} AND staff.staffid=sign_in.staffid AND sign_in.date>#{startTime} and sign_in.date <#{endTime} and staff.userid=user.userid")
+    @Select("select user.*,sign_in.date from staff,user,sign_in where staff.epid=#{epid} and staff.userid=user.userid and staff.staffid in(select staffid from sign_in where sign_in.date>#{startTime} and sign_in.date <#{endTime})")
     List<User> findTodaySignIn(int epid, Timestamp startTime, Timestamp endTime);
 
-    @Select("select user.* from staff,sign_in,user where staff.epid=#{epid} and staff.userid=user.userid AND sign_in.date>#{startTime} and sign_in.date <#{endTime} and staff.staffid not in(sign_in.staffid)")
+    @Select("select user.*,sign_in.date from staff,user,sign_in where staff.epid=#{epid} and staff.userid=user.userid and staff.staffid not in(select staffid from sign_in where sign_in.date>#{startTime} and sign_in.date <#{endTime})")
     List<User> findToadyNotSignIn(int epid, Timestamp startTime, Timestamp endTime);
 
-    @Select("select user.*,sign_in.date from user,staff,sign_in where sign_in.staffid=staff.staffid and staff.epid=1 and staff.userid=user.userid")
+    @Select("select user.*,sign_in.date from staff,user,sign_in where sign_in.staffid=staff.staffid and staff.epid=#{epid} and staff.userid=user.userid")
     List<User> findAllByEpId(int epid);
 }

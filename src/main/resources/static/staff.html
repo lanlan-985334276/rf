@@ -9,10 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <title>H+ 后台主题UI框架 - 联系人</title>
-    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
-    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
-
+    <title>PF - 联系人</title>
     <link rel="shortcut icon" href="favicon.ico">
     <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
     <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
@@ -29,15 +26,13 @@
 
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>所有项目</h5>
-                    <div class="ibox-tools">
-                        <a href="projects.html" class="btn btn-primary btn-xs">创建新项目</a>
-                    </div>
+                    <h5>所有员工</h5>
                 </div>
                 <div class="ibox-content">
                     <div class="row m-b-sm m-t-sm">
                         <div class="col-md-1">
-                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i
+                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"
+                                    onclick="location.reload();"><i
                                     class="fa fa-refresh"></i> 刷新
                             </button>
                         </div>
@@ -111,9 +106,10 @@
             }
         });
     });
+
     function getStaff(list) {
         if (list.length == 0) {
-            let h = '<h3 class="middle-box">暂无数据</h3>';
+            let h = '<h3>暂无数据</h3>';
             $("#staffs").append(h);
             return;
         }
@@ -131,7 +127,7 @@
                 '<h3><strong>#{username}</strong></h3>' +
                 '<p><i class="fa fa-map-marker"></i> #{nativePlace}</p>' +
                 '<address>' +
-                'E-mail:#{email}<br>' +
+                'email:#{email}<br>' +
                 '<abbr title="Phone">Tel:</abbr> #{phone} ' +
                 '</address>' +
                 '</div>' +
@@ -147,7 +143,7 @@
             else
                 html = html.replace(/#{photo}/g, list[i].photo);
             html = html.replace(/#{username}/g, list[i].userName);
-            html = html.replace(/#{nativePlace}/g, list[i].nativePlace == "" ? "" : list[i].nativePlace);
+            html = html.replace(/#{nativePlace}/g, list[i].nativePlace == null ? "未知" : list[i].nativePlace);
             html = html.replace(/#{email}/g, list[i].email == "" ? "" : list[i].email);
             html = html.replace(/#{phone}/g, list[i].phone == "" ? "" : list[i].phone);
             html = html.replace(/#{userId}/g, list[i].userId);
@@ -161,7 +157,7 @@
                     success: function (result) { //服务器成功返回时，执行的匿名函数
                         if (result.state == 1000) {
                             alert("删除成功！");
-                            $("#div-" + list[i].userId).remove();
+                            location.reload();
                         } else {
                             alert(result.message);
                         }

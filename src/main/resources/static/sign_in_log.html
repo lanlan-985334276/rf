@@ -5,17 +5,17 @@
 <!-- Mirrored from www.zi-han.net/theme/hplus/table_basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
 <head>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-<title>RF - 出勤管理</title>
-<link rel="shortcut icon" href="favicon.ico">
-<link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
-<link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
-<link href="css/plugins/iCheck/custom.css" rel="stylesheet">
-<link href="css/animate.min.css" rel="stylesheet">
-<link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <title>RF - 出勤管理</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
 
 </head>
 
@@ -29,7 +29,6 @@
                     <h5>今日未签到</h5>
                 </div>
                 <div class="ibox-content">
-
                     <table class="table">
                         <tbody id="not-sign-in">
 
@@ -42,8 +41,9 @@
         <div class="col-sm-6">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
+                    <h5>今日已签到</h5>
+                </div>
                 <div class="ibox-content">
-
                     <table class="table">
                         <tbody id="sign-in">
 
@@ -51,9 +51,7 @@
                     </table>
 
                 </div>
-                <h5>今日已签到</h5>
             </div>
-        </div>
         </div>
     </div>
 </div>
@@ -137,7 +135,7 @@
                     let list = result.data;
                     console.log("count=" + list.length);
                     if (list.length == 0) {
-                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        let h = '<h3>暂无数据</h3>';
                         $("#sign-in").append(h);
                         return;
                     }
@@ -172,21 +170,17 @@
                     let list = result.data;
                     console.log("count=" + list.length);
                     if (list.length == 0) {
-                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        let h = '<h3>暂无数据</h3>';
                         $("#not-sign-in").append(h);
                         return;
                     }
                     for (let i = 0; i < list.length; i++) {
                         console.log(list[i].userId);
                         let html = '<tr>' +
-                            '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 50px;height: 50px"></td>' +
-                            '<td>#{username}</td>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="' + list[i].photo + '" style="width: 50px;height: 50px"></td>' +
+                            '<td>' + list[i].userName + '</td>' +
+                            '<td></td>' +
                             '</tr>';
-                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
-                        else
-                            html = html.replace(/#{photo}/g, list[i].photo);
-                        html = html.replace(/#{username}/g, list[i].userName);
-                        html = html.replace(/#{userId}/g, list[i].userId);
                         $("#not-sign-in").append(html);
                     }
                 } else {

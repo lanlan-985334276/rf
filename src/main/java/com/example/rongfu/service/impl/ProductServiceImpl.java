@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ProductServiceIml implements IProductService {
+public class ProductServiceImpl implements IProductService {
 
     @Autowired
     private ProductMapper productMapper;

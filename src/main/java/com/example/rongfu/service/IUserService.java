@@ -18,7 +18,8 @@ public interface IUserService {
      * @param code
      * @param eqName
      */
-    void reg(String username, String password, String code, String eqName);
+    void regEp(String username, String password, String code, String eqName);
+    User reg(String username, String password, String code);
 
     /**
      * 用户登录
@@ -39,4 +40,6 @@ public interface IUserService {
 
     List<User> queryStaff(int userId);
     List<User> queryStaff2(int userId,String username);
+
+    User findByUserId(int userId);
 }

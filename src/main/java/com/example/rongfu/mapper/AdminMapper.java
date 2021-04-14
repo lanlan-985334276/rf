@@ -1,10 +1,14 @@
 package com.example.rongfu.mapper;
 
 import com.example.rongfu.entity.Admin;
+import com.example.rongfu.entity.Staff;
 import com.example.rongfu.entity.User;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 处理用户数据的持久层接口
@@ -14,8 +18,11 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface AdminMapper {
 
-    @Select("select * from admin where epid=#{epid}")
-    Admin findByEpId(int epid);
+    @Select("select user.*,admin.adminId from user,admin where epid=(select epid from admin where userid=#{userId}) and admin.userid=user.userid and admin.userid!=#{userId}")
+    List<User> findAll(int userId);
+
+    @Select("select user.* from user,staff where staff.epid=(select epid from admin where userid=#{userId}) and staff.userid=user.userid and staff.userid not in(select userid from admin)")
+    List<User> findOther(int userId);
 
     @Select("select * from admin where userid=#{userid}")
     Admin findByUserId(int userid);
@@ -23,9 +30,12 @@ public interface AdminMapper {
     /**
      * 插入记录
      *
-     * @param userid 用户数据
+     * @param admin 用户数据
      * @return 受影响的行数
      */
-    @Insert("insert into admin(userid) values(userid)")
-    Integer insert(int userid);
+    @Insert("insert into admin(userid,epid) values(#{userId},#{epId})")
+    Integer insert(Admin admin);
+
+    @Delete("delete from admin where adminid=#{adminId}")
+    Integer delete(int adminId);
 }

@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 
 @Service
-public class UploadImgServiceIml implements IUploadImgService {
+public class UploadImgServiceImpl implements IUploadImgService {
     @Override
     public String fileUpload(MultipartFile file, String CKEditorFuncNum) {
         String fileName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
