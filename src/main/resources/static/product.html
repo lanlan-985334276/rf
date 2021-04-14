@@ -257,7 +257,7 @@
             $("#img-photo").append('' +
                 '<img src=' + fileReader.result + ' style="width: 300px;">' +
                 '');
-        }
+        };
         var formData = new FormData($("#form-add")[0]);
         $.ajax({
             url: "/upload/img",
