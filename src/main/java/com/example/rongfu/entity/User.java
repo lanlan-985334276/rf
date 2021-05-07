@@ -62,6 +62,26 @@ public class User {
 
     private int state;
 
+    private String code;
+
+    private String eqName;
+
+    public String getEqName() {
+        return eqName;
+    }
+
+    public void setEqName(String eqName) {
+        this.eqName = eqName;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     public User() {
     }
 

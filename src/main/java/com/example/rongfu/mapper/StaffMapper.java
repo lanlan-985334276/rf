@@ -26,4 +26,7 @@ public interface StaffMapper {
 
     @Select("select * from user where userid in(select userid from staff where epid=#{epid}) and username like #{username}")
     List<User> findByEnterpriseId2(int epid, String username);
+
+    @Select("select * from staff where userid=#{userId}")
+    Staff findByUserId(int userId);
 }

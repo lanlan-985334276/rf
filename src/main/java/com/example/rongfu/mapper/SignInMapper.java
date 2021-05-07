@@ -25,4 +25,7 @@ public interface SignInMapper {
 
     @Select("select user.*,sign_in.date from staff,user,sign_in where sign_in.staffid=staff.staffid and staff.epid=#{epid} and staff.userid=user.userid")
     List<User> findAllByEpId(int epid);
+
+    @Delete("delete from sign_in where staffid=#{staffId}")
+    Integer delete(int staffId);
 }

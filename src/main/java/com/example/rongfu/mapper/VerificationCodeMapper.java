@@ -23,7 +23,7 @@ public interface VerificationCodeMapper {
      * @return 验证码数据
      */
     @Select("select * from verification_code where username=#{username}")
-    VerificationCode findByUsername(String username);
+    List<VerificationCode> findByUsername(String username);
 
 
     /**
@@ -39,4 +39,7 @@ public interface VerificationCodeMapper {
 
     @Delete("delete from verification_code where vcid=#{vcid}")
     Integer delete(int vcid);
+
+    @Delete("delete from verification_code where username=#{userName}")
+    Integer deleteByUserName(String userName);
 }

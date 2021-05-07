@@ -12,25 +12,21 @@ public interface IUserService {
 
     /**
      * 用户注册
-     *
-     * @param username
-     * @param password
-     * @param code
-     * @param eqName
      */
-    void regEp(String username, String password, String code, String eqName);
-    User reg(String username, String password, String code);
+    void regEp(User user);
+
+    User reg(User user);
 
     /**
      * 用户登录
      *
-     * @param username 用户名
-     * @param password 密码
      * @return 登录用户的信息
      */
-    User login(String username, String password);
+    User login(User user);
 
-    void sendCode(String username);
+    User loginByCode(String userName,String code);
+
+    String sendCode(String username);
 
     List<User> queryUserToAdd(String username);
 
@@ -39,7 +35,14 @@ public interface IUserService {
     void deleteStaff(int userId);
 
     List<User> queryStaff(int userId);
-    List<User> queryStaff2(int userId,String username);
+
+    List<User> queryStaff2(int userId, String username);
 
     User findByUserId(int userId);
+
+    User findByUserName(String userName);
+
+    User equalsCode(User user);
+    User loginApp(User user);
+    User regOther(User user);
 }

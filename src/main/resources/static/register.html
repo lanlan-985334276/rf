@@ -37,7 +37,7 @@
         <p>创建一个RF新账户</p>
         <form id="form-reg" class="m-t" role="form" action="login.html">
             <div class="form-group">
-                <input id="username" name="username" type="text" class="form-control" placeholder="请输入邮箱或手机号"
+                <input id="username" name="userName" type="text" class="form-control" placeholder="请输入邮箱或手机号"
                        required="">
             </div>
             <div class="input-group form-group">
@@ -55,7 +55,7 @@
                        required="">
             </div>
             <div class="form-group">
-                <input id="epname" name="epname" type="text" class="form-control" placeholder="请输入企业名"
+                <input id="epname" name="epName" type="text" class="form-control" placeholder="请输入企业名"
                        required="">
             </div>
             <button id="btn-reg" type="button" class="btn btn-primary block full-width m-b">注 册</button>
@@ -86,7 +86,7 @@
         }
         $.ajax({
             url: "/users/sendCode", //请求url
-            data:"username="+$("#username").val(),
+            data: $("#form-reg").serialize(),
             method: "post", //请求方式
             dataType: "json", //返回值类型
             success: function (result) { //服务器成功返回时，执行的匿名函数
@@ -104,7 +104,7 @@
             alert("用户名不能为空！");
             return;
         }
-        if ($("#code").val()==""){
+        if ($("#code").val() == "") {
             alert("验证码不能为空！");
             return;
         }
@@ -117,13 +117,13 @@
             alert("两次密码输入不一致！");
             return;
         }
-        if ($("#epname").val()==""){
+        if ($("#epname").val() == "") {
             alert("企业名不能为空！");
             return;
         }
         //发送ajax请求，请求注册
         $.ajax({
-            url: "/users/register", //请求url
+            url: "/users/regEp", //请求url
             data: $("#form-reg").serialize(), //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
             method: "post", //请求方式
             dataType: "json", //返回值类型

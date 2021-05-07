@@ -31,14 +31,17 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private StaffMapper staffMapper;
 
+    @Autowired
+    private SignInMapper signInMapper;
+
     @Override
-    public void regEp(String username, String password, String code, String eqName) {
-        User result = reg(username, password, code);
+    public void regEp(User user) {
+        User result = reg(user);
         //判断企业是否已注册
-        if (enterpriseMapper.findByName(eqName) != null)
+        if (enterpriseMapper.findByName(user.getEqName()) != null)
             throw new UserNameErrorException("注册失败，企业已注册！");
         Enterprise enterprise = new Enterprise();
-        enterprise.setEpName(eqName);
+        enterprise.setEpName(user.getEqName());
         enterprise.setUserId(result.getUserId());
         enterprise.setTime(new Timestamp(new Date().getTime()));
         //调用userMapper的insert方法进行插入
@@ -52,52 +55,55 @@ public class UserServiceImpl implements IUserService {
             userMapper.delete(result.getUserId());
             throw new FailedException("注册失败，未知插入错误！请联系管理员!");
         }
+        List<VerificationCode> vCode = codeMapper.findByUsername(user.getUserName());
+        if (vCode.size() > 0)
+            codeMapper.delete(vCode.get(vCode.size() - 1).getVcId());
     }
 
     @Override
-    public User reg(String username, String password, String code) {
+    public User reg(User user) {
         User result = null;
-        if (StringUtils.isPhone(username)) {
-            result = userMapper.findByPhone(username);
+        if (StringUtils.isPhone(user.getUserName())) {
+            result = userMapper.findByPhone(user.getUserName());
             if (result != null)
                 throw new PhoneDuplicateException("注册失败，手机号已注册！");
             result = new User();
-            result.setPhone(username);
-        } else if (StringUtils.isEmail(username)) {
-            result = userMapper.findByEmail(username);
+            result.setPhone(user.getUserName());
+        } else if (StringUtils.isEmail(user.getUserName())) {
+            result = userMapper.findByEmail(user.getUserName());
             if (result != null)
                 throw new EmailDuplicateException("注册失败，邮箱已注册！");
             result = new User();
-            result.setEmail(username);
+            result.setEmail(user.getUserName());
         } else {
             throw new UserNameErrorException("注册失败，格式错误！");
         }
         //判断验证码是否正确
-        VerificationCode vCode = codeMapper.findByUsername(username);
-        if (vCode == null || !vCode.getVerificationCode().equals(code))
+        List<VerificationCode> vCode = codeMapper.findByUsername(user.getUserName());
+
+        if (vCode.size() == 0 || !vCode.get(vCode.size() - 1).getVerificationCode().equals(user.getCode()))
             throw new VerificationCodeErrorException("验证码错误！");
-        codeMapper.delete(vCode.getVcId());
-        result.setUserName(username);
-        result.setPassword(password);
+        result.setUserName(user.getUserName());
+        result.setPassword(user.getPassword());
         return result;
     }
 
     @Override
-    public User login(String username, String password) {
+    public User login(User user) {
         //调用userMapper的findByUsername按用户名进行查询
         User result;
-        if (StringUtils.isPhone(username))
-            result = userMapper.findByPhone(username);
-        else if (StringUtils.isEmail(username))
-            result = userMapper.findByEmail(username);
-        else result = userMapper.findByUserName(username);
+        if (StringUtils.isPhone(user.getUserName()))
+            result = userMapper.findByPhone(user.getUserName());
+        else if (StringUtils.isEmail(user.getUserName()))
+            result = userMapper.findByEmail(user.getUserName());
+        else result = userMapper.findByUserName(user.getUserName());
         //若未找到，抛出UserNotFoundException
         if (result == null) {
             throw new UserNotFoundException("用户不存在");
         }
         //比较密码是否匹配
         //若不匹配，抛出PasswordNotMatchException
-        if (!password.equals(result.getPassword())) {
+        if (!user.getPassword().equals(result.getPassword())) {
             throw new PasswordNotMatchException("密码错误");
         }
         Enterprise enterprise = enterpriseMapper.findByUserId(result.getUserId());
@@ -113,9 +119,28 @@ public class UserServiceImpl implements IUserService {
         result.setLastLoginTime(new Timestamp(new Date().getTime()));
         if (userMapper.updateLastLoginTime(result) != 1)
             throw new FailedException("登录失败，未知错误，请联系管理员！");
+        codeMapper.deleteByUserName(user.getUserName());
         return result;
     }
 
+    @Override
+    public User loginByCode(String userName, String code) {
+        User result;
+        if (StringUtils.isPhone(userName))
+            result = userMapper.findByPhone(userName);
+        else if (StringUtils.isEmail(userName))
+            result = userMapper.findByEmail(userName);
+        else result = userMapper.findByUserName(userName);
+        //若未找到，抛出UserNotFoundException
+        if (result == null) {
+            throw new UserNotFoundException("用户不存在");
+        }
+        List<VerificationCode> vCode = codeMapper.findByUsername(userName);
+        if (vCode.size() == 0 || !vCode.get(vCode.size() - 1).getVerificationCode().equals(code))
+            throw new VerificationCodeErrorException("验证码错误！");
+        codeMapper.deleteByUserName(userName);
+        return result;
+    }
 
     @Value("${spring.mail.username}")
     private String from;
@@ -123,7 +148,7 @@ public class UserServiceImpl implements IUserService {
     private JavaMailSender mailSender;
 
     @Override
-    public void sendCode(String username) {
+    public String sendCode(String username) {
         String code = Integer.toString((int) ((Math.random() * 9 + 1) * 100000));
         String content = "欢迎您使用RongFu平台，您的验证码为：" + code;
         if (StringUtils.isEmail(username)) {
@@ -159,9 +184,13 @@ public class UserServiceImpl implements IUserService {
         vCode.setUsername(username);
         vCode.setStartTime(new Timestamp(time));
         vCode.setEndTime(new Timestamp(time + 5 * 60 * 1000));
+        if (codeMapper.findByUsername(username).size() > 0) {
+            codeMapper.deleteByUserName(username);
+        }
         if (codeMapper.insert(vCode) != 1) {
             throw new FailedException("发送验证码失败，未知插入错误，请联系管理员！");
         }
+        return code;
     }
 
     @Override
@@ -187,6 +216,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void deleteStaff(int userId) {
         System.out.println(userId);
+        signInMapper.delete(staffMapper.findByUserId(userId).getStaffId());
+        adminMapper.delete(adminMapper.findByUserId(userId).getAdminId());
         if (staffMapper.delete(userId) != 1)
             throw new FailedException("删除失败，未知删除错误，请联系管理员！");
     }
@@ -210,5 +241,66 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User findByUserId(int userId) {
         return userMapper.findByUserId(userId);
+    }
+
+    @Override
+    public User findByUserName(String userName) {
+        User user = userMapper.findByUserName(userName);
+        if (user == null) throw new FailedException("用户不存在！");
+        return user;
+    }
+
+    @Override
+    public User equalsCode(User user) {
+
+        return null;
+    }
+
+    @Override
+    public User loginApp(User user) {
+        //调用userMapper的findByUsername按用户名进行查询
+        User result;
+        if (StringUtils.isPhone(user.getUserName()))
+            result = userMapper.findByPhone(user.getUserName());
+        else if (StringUtils.isEmail(user.getUserName()))
+            result = userMapper.findByEmail(user.getUserName());
+        else result = userMapper.findByUserName(user.getUserName());
+        //若未找到，抛出UserNotFoundException
+        if (result == null) {
+            throw new UserNotFoundException("用户不存在");
+        }
+        //比较密码是否匹配
+        //若不匹配，抛出PasswordNotMatchException
+        if (!user.getPassword().equals(result.getPassword())) {
+            throw new PasswordNotMatchException("密码错误");
+        }
+        Enterprise enterprise = enterpriseMapper.findByUserId(result.getUserId());
+        Admin admin = adminMapper.findByUserId(result.getUserId());
+
+        if (enterprise != null) {
+            result.setEnterprise(true);
+        } else if (admin != null) {
+            result.setAdmin(true);
+        }
+        //返回登录者的用户信息
+        result.setLastLoginTime(new Timestamp(new Date().getTime()));
+        if (userMapper.updateLastLoginTime(result) != 1)
+            throw new FailedException("登录失败，未知错误，请联系管理员！");
+        codeMapper.deleteByUserName(user.getUserName());
+        return result;
+    }
+
+    @Override
+    public User regOther(User user) {
+        user = reg(user);
+        Integer rows = userMapper.insert(user);
+        //若影响行数不为1，则抛出InsertException
+        if (rows != 1) {
+            throw new InsertException("注册失败，未知插入错误！请联系管理员!");
+        }
+        List<VerificationCode> vCode = codeMapper.findByUsername(user.getUserName());
+        if (vCode.size() > 0)
+            codeMapper.delete(vCode.get(vCode.size() - 1).getVcId());
+        return user;
     }
 }
