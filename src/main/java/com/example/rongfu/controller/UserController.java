@@ -1,9 +1,12 @@
 package com.example.rongfu.controller;
 
+import com.example.rongfu.entity.Staff;
 import com.example.rongfu.entity.User;
 import com.example.rongfu.service.IUserService;
 import com.example.rongfu.util.JsonResult;
+import com.example.rongfu.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,20 +25,18 @@ public class UserController extends BaseController {
     @Autowired //取出Spring框架容器中的对象（IUserService实现类的对象）赋给下面的成员变量
     private IUserService userService;
 
-    //@RequestMapping注解，写在方法上，表示该方法处理
-    // 具体指定url值（/users/reg）的请求
-    @RequestMapping("/regEp")
-    //@ResponseBody该注解表示将方法的返回值作为响应体的内容（该注解会自动将
-    //方法的返回值，先转换成json格式，再进行响应）
-    //@ResponseBody
-    JsonResult<Void> regEp(User user) {
-        userService.regEp(user);
-        return new JsonResult<>(OK);
-    }
+    private final String TAG = "UserController==";
 
-    @RequestMapping("/reg")
-    JsonResult<Void> reg(User user) {
-        userService.reg(user);
+
+    /**
+     * 注册为企业
+     *
+     * @param userStr
+     * @return
+     */
+    @RequestMapping("/regEp")
+    JsonResult<Void> regEp(@RequestBody String userStr) {
+        userService.regEp(JsonUtils.json2User(userStr));
         return new JsonResult<>(OK);
     }
 
@@ -45,11 +46,8 @@ public class UserController extends BaseController {
      * @return JsonResult对象
      */
     @RequestMapping("/login")
-//@ResponseBody
-    JsonResult<User> login(User user, HttpSession session) {
-        User data = userService.login(user); //ctrl+alt+t
-        //登录成功，保存登录用户信息供后续业务使用
-        System.out.println(data);
+    JsonResult<User> loginWeb(@RequestBody String userStr, HttpSession session) {
+        User data = userService.loginWeb(JsonUtils.json2User(userStr)); //ctrl+alt+t
         if (session != null) {
             session.setAttribute("userId", data.getUserId());
             session.setAttribute("username", data.getUserName());
@@ -60,14 +58,15 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping("/loginApp")
-    JsonResult<User> loginApp(User user) {
-        User data = userService.loginApp(user); //ctrl+alt+t
+    JsonResult<User> loginApp(@RequestBody String userStr) {
+        User data = userService.loginApp(JsonUtils.json2User(userStr)); //ctrl+alt+t
         return new JsonResult<>(OK, data);
     }
 
     @RequestMapping("/loginByCode")
-    JsonResult<User> loginByCode(String userName, String code, HttpSession session) {
-        User data = userService.loginByCode(userName, code);
+    JsonResult<User> loginByCode(@RequestBody String userStr, HttpSession session) {
+        User user = JsonUtils.json2User(userStr);
+        User data = userService.loginByCode(user.getUserName(), user.getCode());
         if (session != null) {
             session.setAttribute("userId", data.getUserId());
             session.setAttribute("username", data.getUserName());
@@ -79,55 +78,118 @@ public class UserController extends BaseController {
 
 
     @RequestMapping("/sendCode")
-    JsonResult<String> sendCode(User user) {
-        System.out.println(user);
-        return new JsonResult<>(OK, userService.sendCode(user.getUserName()));
+    JsonResult<String> sendCode(@RequestBody String userStr) {
+        return new JsonResult<>(OK, userService.sendCode(JsonUtils.json2User(userStr).getUserName()));
     }
 
 
     @RequestMapping("/queryUserToAdd")
-    JsonResult<List<User>> queryUserToAdd(String username) {
-        return new JsonResult<>(OK, userService.queryUserToAdd(username));
+    JsonResult<List<User>> queryUserToAdd(@RequestBody String userStr, HttpSession session) {
+        User user = JsonUtils.json2User(userStr);
+        if (session != null) user.setUserId(Integer.valueOf(session.getAttribute("userId").toString()));
+        return new JsonResult<>(OK, userService.queryUserToAdd(user));
     }
 
+    /**
+     * 添加员工
+     *
+     * @param staffStr
+     * @param session
+     * @return
+     */
     @RequestMapping("/addStaff")
-    JsonResult<Void> addStaff(int userId, int mUserId, HttpSession session) {
-        if (session == null)
-            mUserId = Integer.valueOf(session.getAttribute("userId").toString());
-        userService.addStaff(mUserId, userId);
+    JsonResult<Void> addStaff(@RequestBody String staffStr, HttpSession session) {
+        Staff staff = JsonUtils.json2Staff(staffStr);
+        if (session != null)
+            staff.setmUserId(Integer.valueOf(session.getAttribute("userId").toString()));
+        userService.addStaff(staff.getmUserId(), staff.getUserId());
         return new JsonResult<>(OK);
     }
 
+    /**
+     * 根据用户ID删除员工
+     *
+     * @param userStr
+     * @return
+     */
     @RequestMapping("/deleteStaff")
-    JsonResult<Void> deleteStaff(int userId) {
-        userService.deleteStaff(userId);
+    JsonResult<Void> deleteStaff(@RequestBody String userStr) {
+        userService.deleteStaff(JsonUtils.json2User(userStr).getUserId());
         return new JsonResult<>(OK);
     }
 
-    @RequestMapping("/queryStaff")
-    JsonResult<List<User>> queryStaff(User user, HttpSession session) {
+    /**
+     * 查找所有员工（根据当前登录的ID）
+     *
+     * @param userStr
+     * @param session
+     * @return
+     */
+    @RequestMapping("/queryAllStaff")
+    JsonResult<List<User>> queryAllStaff(@RequestBody String userStr, HttpSession session) {
+        User user = new User();
         if (session != null)
             user.setUserId(Integer.valueOf(session.getAttribute("userId").toString()));
-        return new JsonResult<>(OK, user.getUserName() != null ? userService.queryStaff2(user.getUserId(), user.getUserName()) : userService.queryStaff(user.getUserId()));
+        else user = JsonUtils.json2User(userStr);
+        return new JsonResult<>(OK, userService.queryAllStaff(user.getUserId()));
     }
 
+    /**
+     * 查找所有员工（根据当前登录的ID及筛选条件）
+     *
+     * @param userStr
+     * @param session
+     * @return
+     */
+    @RequestMapping("/queryStaffByUserName")
+    JsonResult<List<User>> queryStaffByUserName(@RequestBody String userStr, HttpSession session) {
+        User user = JsonUtils.json2User(userStr);
+        if (session != null)
+            user.setUserId(Integer.valueOf(session.getAttribute("userId").toString()));
+        return new JsonResult<>(OK, userService.queryStaffByUserName(user.getUserId(), user.getUserName()));
+    }
+
+    /**
+     * 根据用户ID查找
+     *
+     * @param user
+     * @return
+     */
     @RequestMapping("/findByUserId")
     JsonResult<User> queryStaff(User user) {
         return new JsonResult<>(OK, userService.findByUserId(user.getUserId()));
     }
 
+    /**
+     * 根据用户名查找
+     *
+     * @param userName
+     * @return
+     */
     @RequestMapping("/findByUserName")
     JsonResult<User> findByUserName(String userName) {
         return new JsonResult<>(OK, userService.findByUserName(userName));
     }
 
+    /**
+     * 验证 验证码
+     *
+     * @param userStr
+     * @return
+     */
     @RequestMapping("/equalsCode")
-    JsonResult<User> equalsCode(User user) {
-        return new JsonResult<>(OK, userService.reg(user));
+    JsonResult<User> equalsCode(@RequestBody String userStr) {
+        return new JsonResult<>(OK, userService.equalsCode(JsonUtils.json2User(userStr)));
     }
 
+    /**
+     * 注册为普通用户
+     *
+     * @param userStr
+     * @return
+     */
     @RequestMapping("/regOther")
-    JsonResult<User> regOther(User user) {
-        return new JsonResult<>(OK, userService.regOther(user));
+    JsonResult<User> regOther(@RequestBody String userStr) {
+        return new JsonResult<>(OK, userService.regOther(JsonUtils.json2User(userStr)));
     }
 }

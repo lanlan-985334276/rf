@@ -15,28 +15,26 @@ public interface IUserService {
      */
     void regEp(User user);
 
-    User reg(User user);
-
     /**
      * 用户登录
      *
      * @return 登录用户的信息
      */
-    User login(User user);
+    User loginWeb(User user);
 
     User loginByCode(String userName,String code);
 
-    String sendCode(String username);
+    String sendCode(String email);
 
-    List<User> queryUserToAdd(String username);
+    List<User> queryUserToAdd(User user);
 
     void addStaff(int mUserId, int userId);
 
     void deleteStaff(int userId);
 
-    List<User> queryStaff(int userId);
+    List<User> queryAllStaff(int userId);
 
-    List<User> queryStaff2(int userId, String username);
+    List<User> queryStaffByUserName(int userId, String username);
 
     User findByUserId(int userId);
 

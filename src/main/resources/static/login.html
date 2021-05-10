@@ -71,12 +71,18 @@
             alert("密码不能为空！");
             return;
         }
-
+        var array = $("#form-login").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
+        console.log(JSON.stringify(jsonObj));
         //发送ajax请求，请求注册
         $.ajax({
             url: "/users/login", //请求url
-            data: $("#form-login").serialize(), //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
+            data:  JSON.stringify(jsonObj),
             method: "post", //请求方式
+            contentType: "application/json;charset=utf-8",
             dataType: "json", //返回值类型
             success: function(result){ //服务器成功返回时，执行的匿名函数
                 if( result.state == 1000){

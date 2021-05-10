@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <title>PF - 联系人</title>
+    <title>RF - 联系人</title>
     <link rel="shortcut icon" href="favicon.ico">
     <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
     <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
@@ -23,7 +23,6 @@
 <div class="wrapper wrapper-content animated fadeInUp">
     <div class="row">
         <div class="col-sm-12">
-
             <div class="ibox">
                 <div class="ibox-title">
                     <h5>所有员工</h5>
@@ -65,10 +64,11 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $.ajax({
-            url: "/users/queryStaff", //请求url
-            data: "",
+            url: "/users/queryAllStaff", //请求url
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#staffs").empty();
@@ -90,10 +90,11 @@
             return;
         }
         $.ajax({
-            url: "/users/queryStaff", //请求url
-            data: "username=" + $("#username").val(),
+            url: "/users/queryStaffByUserName", //请求url
+            data: "{userName:" + $("#username").val() + "}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#staffs").empty();
@@ -115,46 +116,42 @@
         }
         for (let i = 0; i < list.length; i++) {
             console.log(list[i].userId);
-            let html = '<div class="col-sm-4" id="div-#{userId}">' +
+            let html = '<div class="col-sm-6" id="div-#{userId}">' +
                 '<div class="contact-box">' +
-                '<a href="#">' +
-                '<div class="col-sm-4">' +
+                '<div class="col-sm-3">' +
                 '<div class="text-center">' +
-                '<img alt="image" class="img-circle m-t-xs img-responsive" src="#{photo}" style="width:70px; height: 70px;">' +
+                '<img alt="image" class="img-circle m-t-xs img-responsive" src="#{photo}" style="width:50px; height: 50px;">' +
                 '</div>' +
                 '</div>' +
-                '<div class="col-sm-8">' +
+                '<div class="col-sm-7">' +
                 '<h3><strong>#{username}</strong></h3>' +
-                '<p><i class="fa fa-map-marker"></i> #{nativePlace}</p>' +
                 '<address>' +
                 'email:#{email}<br>' +
-                '<abbr title="Phone">Tel:</abbr> #{phone} ' +
                 '</address>' +
                 '</div>' +
-                '<div class="middle-box">' +
-                '<span class="btn">' +
+                '<div class="col-sm-2">' +
+                '<span class="input-group-btn">' +
                 '<button id="delete-#{userId}" type="button" class="btn btn-primary">删除</button>' +
                 '</span>' +
                 '</div>' +
-                '</a>' +
+                '<div class="clearfix"></div>' +
                 '</div>' +
                 '</div>';
-            if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/ng.png");
+            if (list[i].photo == "" || list[i].photo==undefined) html = html.replace(/#{photo}/g, "img/profile_small.jpg");
             else
                 html = html.replace(/#{photo}/g, list[i].photo);
             html = html.replace(/#{username}/g, list[i].userName);
-            html = html.replace(/#{nativePlace}/g, list[i].nativePlace == null ? "未知" : list[i].nativePlace);
             html = html.replace(/#{email}/g, list[i].email == "" ? "" : list[i].email);
-            html = html.replace(/#{phone}/g, list[i].phone == "" ? "" : list[i].phone);
             html = html.replace(/#{userId}/g, list[i].userId);
             $("#staffs").append(html);
             $("#delete-" + list[i].userId).click(function () {
                 $.ajax({
                     url: "/users/deleteStaff", //请求url
-                    data: "userId=" + list[i].userId, //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
+                    data: "{userId:" + list[i].userId + "}",
                     method: "post", //请求方式
                     dataType: "json", //返回值类型
-                    success: function (result) { //服务器成功返回时，执行的匿名函数
+                    contentType: "application/json;charset=utf-8",
+                    success: function (result) {
                         if (result.state == 1000) {
                             alert("删除成功！");
                             location.reload();

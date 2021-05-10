@@ -3,7 +3,9 @@ package com.example.rongfu.controller;
 import com.example.rongfu.entity.User;
 import com.example.rongfu.service.ISignInService;
 import com.example.rongfu.util.JsonResult;
+import com.example.rongfu.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,9 +26,18 @@ public class SignInController extends BaseController {
         return new JsonResult<>(OK, list);
     }
 
+    /**
+     * 今日已签到
+     * @param userStr
+     * @param session
+     * @return
+     */
     @RequestMapping("/todayAllSILog")
-    JsonResult<List<User>> todayAll(HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    JsonResult<List<User>> todayAll(@RequestBody String userStr, HttpSession session) {
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = JsonUtils.json2User(userStr).getUserId();
         List<User> list = signInService.ToadySignIn(userId);
         return new JsonResult<>(OK, list);
     }

@@ -126,9 +126,10 @@
         $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green"});
         $.ajax({
             url: "/signIn/todayAllSILog", //请求url
-            data: "",
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#sign-in").empty();

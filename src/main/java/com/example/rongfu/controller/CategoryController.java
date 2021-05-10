@@ -35,7 +35,7 @@ public class CategoryController extends BaseController {
         return new JsonResult<>(OK);
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping("/deleteByStaffId")
     JsonResult<Void> delete(int pcId, HttpSession session) {
         int userId = Integer.valueOf(session.getAttribute("userId").toString());
         ProductCategory category = new ProductCategory();

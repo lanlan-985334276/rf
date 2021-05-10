@@ -37,19 +37,6 @@ public class User {
      * 账号状态 0:离线 1:在线 2:注销
      */
     private int status;
-    /**
-     * 身份证号
-     */
-    private String idNumber;
-    /**
-     * 籍贯
-     */
-    private String nativePlace;
-
-    /**
-     * 住址
-     */
-    private String address;
 
     private boolean isAdmin;
 
@@ -61,7 +48,9 @@ public class User {
     private int staffId;
 
     private int state;
-
+    /**
+     * 用于验证码登录
+     */
     private String code;
 
     private String eqName;
@@ -173,30 +162,6 @@ public class User {
         this.status = status;
     }
 
-    public String getIdNumber() {
-        return idNumber;
-    }
-
-    public void setIdNumber(String idNumber) {
-        this.idNumber = idNumber;
-    }
-
-    public String getNativePlace() {
-        return nativePlace;
-    }
-
-    public void setNativePlace(String nativePlace) {
-        this.nativePlace = nativePlace;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public Timestamp getLastLoginTime() {
         return lastLoginTime;
     }
@@ -241,9 +206,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", lastLoginTime=" + lastLoginTime +
                 ", status=" + status +
-                ", idNumber='" + idNumber + '\'' +
-                ", nativePlace='" + nativePlace + '\'' +
-                ", address='" + address + '\'' +
                 ", isAdmin=" + isAdmin +
                 ", isEnterprise=" + isEnterprise +
                 ", date=" + date +

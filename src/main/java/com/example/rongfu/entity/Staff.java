@@ -7,6 +7,7 @@ public class Staff {
     private int userId;
     private int epId;
     private Timestamp addTime;
+    private int mUserId;
 
     public Staff() {
     }
@@ -43,6 +44,14 @@ public class Staff {
         this.addTime = addTime;
     }
 
+    public int getmUserId() {
+        return mUserId;
+    }
+
+    public void setmUserId(int mUserId) {
+        this.mUserId = mUserId;
+    }
+
     @Override
     public String toString() {
         return "Staff{" +
@@ -50,6 +59,7 @@ public class Staff {
                 ", userId=" + userId +
                 ", epId=" + epId +
                 ", addTime=" + addTime +
+                ", mUserId=" + mUserId +
                 '}';
     }
 }

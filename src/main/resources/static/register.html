@@ -27,7 +27,7 @@
 
 <body class="gray-bg">
 
-<div class="middle-box text-center loginscreen   animated fadeInDown">
+<div class="middle-box text-center loginscreen  animated fadeInDown">
     <div>
         <div>
             <h1 class="logo-name" style="font-size: 90px">RF</h1>
@@ -37,7 +37,7 @@
         <p>创建一个RF新账户</p>
         <form id="form-reg" class="m-t" role="form" action="login.html">
             <div class="form-group">
-                <input id="username" name="userName" type="text" class="form-control" placeholder="请输入邮箱或手机号"
+                <input id="username" name="userName" type="text" class="form-control" placeholder="请输入邮箱"
                        required="">
             </div>
             <div class="input-group form-group">
@@ -81,14 +81,21 @@
 <script type="text/javascript">
     $("#send-code").click(function () {
         if ($("#username").val() == "") {
-            alert("请输入邮箱或手机号！");
+            alert("请输入邮箱！");
             return;
         }
+        var array = $("#form-reg").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
+        console.log(JSON.stringify(jsonObj));
         $.ajax({
             url: "/users/sendCode", //请求url
-            data: $("#form-reg").serialize(),
+            data: JSON.stringify(jsonObj),
             method: "post", //请求方式
-            dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     alert("已发送！");
@@ -121,11 +128,17 @@
             alert("企业名不能为空！");
             return;
         }
+        var array = $("#form-reg").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
         //发送ajax请求，请求注册
         $.ajax({
             url: "/users/regEp", //请求url
-            data: $("#form-reg").serialize(), //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
+            data: JSON.stringify(jsonObj), //自动把表单有name属性的输入元素的数据，转换成类似username=xxx&password=xxx这种形式
             method: "post", //请求方式
+            contentType: "application/json;charset=utf-8",
             dataType: "json", //返回值类型
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {

@@ -23,6 +23,9 @@ public interface EnterpriseMapper {
     @Select("select * from enterprise where epName=#{epName}")
     Enterprise findByName(String epName);
 
+    @Select("select * from enterprise where epid=#{epid}")
+    Enterprise findByEpId(int epid);
+
     /**
      * 插入记录
      *

@@ -57,7 +57,7 @@ public class CustomerController extends BaseController {
         return new JsonResult<>(OK, customerService.update(customer));
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping("/deleteByStaffId")
     JsonResult<Void> delete(Customer customer, HttpSession session) {
         int userId = Integer.valueOf(session.getAttribute("userId").toString());
         customer.setUserId(userId);

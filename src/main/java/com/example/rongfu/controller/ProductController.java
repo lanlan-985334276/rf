@@ -59,7 +59,7 @@ public class ProductController extends BaseController {
         return new JsonResult<>(OK, productService.update(product));
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping("/deleteByStaffId")
     JsonResult<Void> delete(Product product, HttpSession session) {
         int userId = Integer.valueOf(session.getAttribute("userId").toString());
         product.setUserId(userId);

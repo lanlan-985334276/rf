@@ -37,8 +37,8 @@ public interface UserMapper {
      * @param user 用户数据
      * @return 受影响的行数
      */
-    @Insert("insert into user(username,password,sex,photo,phone,email,lastlogintime,status,idnumber,nativeplace,address) " +
-            "values(#{userName},#{password},#{sex},#{photo},#{phone},#{email},#{lastLoginTime},#{status},#{idNumber},#{nativePlace},#{address})")
+    @Insert("insert into user(username,password,sex,photo,phone,email,lastlogintime,status) " +
+            "values(#{userName},#{password},#{sex},#{photo},#{phone},#{email},#{lastLoginTime},#{status})")
     Integer insert(User user);
 
     @Update("update user set lastLoginTime=#{lastLoginTime} where userid=#{userId}")
@@ -47,6 +47,6 @@ public interface UserMapper {
     @Delete("delete from user where userid=#{userid}")
     Integer delete(int userid);
 
-    @Select("select user.* from user,staff where user.userid not in(staff.userid) and user.username like #{username}")
+    @Select("select * from user where userid not in(select userid from staff) and username like #{username}")
     List<User> findNotInEnterprise(String username);
 }
