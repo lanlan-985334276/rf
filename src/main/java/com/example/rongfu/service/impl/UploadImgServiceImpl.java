@@ -4,11 +4,13 @@ import com.example.rongfu.service.IUploadImgService;
 import com.example.rongfu.service.ex.FailedException;
 import com.example.rongfu.util.FileUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
 @Service
+@Transactional
 public class UploadImgServiceImpl implements IUploadImgService {
     @Override
     public String fileUpload(MultipartFile file, String CKEditorFuncNum) {

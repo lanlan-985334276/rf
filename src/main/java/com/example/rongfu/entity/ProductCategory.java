@@ -3,6 +3,7 @@ package com.example.rongfu.entity;
 public class ProductCategory {
     private int pcId;
     private String pcName;
+    private int epid;
     private int userId;
 
     public ProductCategory() {
@@ -24,6 +25,14 @@ public class ProductCategory {
         this.pcName = pcName;
     }
 
+    public int getEpid() {
+        return epid;
+    }
+
+    public void setEpid(int epid) {
+        this.epid = epid;
+    }
+
     public int getUserId() {
         return userId;
     }
@@ -34,10 +43,11 @@ public class ProductCategory {
 
     @Override
     public String toString() {
-        return "ProductCategroy{" +
+        return "ProductCategory{" +
                 "pcId=" + pcId +
                 ", pcName='" + pcName + '\'' +
-                ", userid=" + userId +
+                ", epid=" + epid +
+                ", userId=" + userId +
                 '}';
     }
 }

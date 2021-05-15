@@ -12,8 +12,25 @@ public class Customer {
     private String content;
     private Timestamp addTime;
     private String contact;
-
+    private String time;
+    private int epid;
     public Customer() {
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public int getEpid() {
+        return epid;
+    }
+
+    public void setEpid(int epid) {
+        this.epid = epid;
     }
 
     public int getCustomerId() {
@@ -100,6 +117,8 @@ public class Customer {
                 ", content='" + content + '\'' +
                 ", addTime=" + addTime +
                 ", contact='" + contact + '\'' +
+                ", time='" + time + '\'' +
+                ", epid=" + epid +
                 '}';
     }
 }

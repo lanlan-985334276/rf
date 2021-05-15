@@ -11,6 +11,9 @@ public class Product {
     private double price;
     private String content;
     private int userId;
+    private int epid;
+    private String time;
+    private int count=0;
 
     public Product() {
     }
@@ -80,6 +83,30 @@ public class Product {
         this.userId = userId;
     }
 
+    public int getEpid() {
+        return epid;
+    }
+
+    public void setEpid(int epid) {
+        this.epid = epid;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -91,6 +118,9 @@ public class Product {
                 ", price=" + price +
                 ", content='" + content + '\'' +
                 ", userId=" + userId +
+                ", epid=" + epid +
+                ", time='" + time + '\'' +
+                ", count=" + count +
                 '}';
     }
 }

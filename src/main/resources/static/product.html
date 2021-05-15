@@ -43,24 +43,7 @@
                                 <a id="a-add" data-toggle="modal" class="btn btn-primary" href="product.html#modal-add">添加</a>
                             </div>
                         </div>
-                        <div class="col-sm-2 m-b-xs">
-                            <select class="input-sm form-control input-s-sm inline" id="all-pcId" name="pcId">
-                            </select>
-                        </div>
-                        <div class="col-sm-5 m-b-xs">
-                            <div class="form-group">
-                                <input readonly class="form-control layer-date" id="hello1">
-                                <label class="laydate-icon inline demoicon"
-                                       onclick="laydate({elem: '#hello1'});"></label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="input-group">
-                                <input type="text" placeholder="请输入产品名" class="input-sm form-control"> <span
-                                    class="input-group-btn">
-                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
-                            </div>
-                        </div>
+
                     </div>
                     <table class="table">
                         <thead>
@@ -71,6 +54,7 @@
                             <th>产品分类</th>
                             <th>产品价格</th>
                             <th>发布时间</th>
+                            <th>库存</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -90,6 +74,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <form class="form-horizontal m-t" id="form-add">
+                            <input id="productId" name="productId" type="hidden">
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">产品名称：</label>
                                 <div class="col-sm-8">
@@ -172,21 +157,19 @@
 
     function getCategory() {
         $("#add-pcId").empty();
-        $("#all-pcId").empty();
         $.ajax({
-            url: "/category/all",
-            data: "",
-            method: "post",
-            dataType: "json",
+            url: "/category/all", //请求url
+            data: "{}",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) {
                 if (result.state == 1000) {
                     let list = result.data;
                     var option1 = '<option>' + (list.length > 0 ? '请选择' : '暂无数据') + '</option>';
                     $("#add-pcId").append(option1);
-                    $("#all-pcId").append(option1);
                     for (let i = 0; i < list.length; i++) {
                         $("#add-pcId").append('<option value="' + list[i].pcId + '">' + list[i].pcName + '</option>');
-                        $("#all-pcId").append('<option value="' + list[i].pcId + '">' + list[i].pcName + '</option>');
                     }
                 } else alert(result.message);
             }
@@ -197,8 +180,9 @@
         getCategory();
         $.ajax({
             url: "/product/all", //请求url
-            data: "",
+            data: "{}",
             method: "post", //请求方式
+            contentType: "application/json;charset=utf-8",
             dataType: "json", //返回值类型
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
@@ -219,6 +203,7 @@
                             '<td>' + list[i].pcId + '</td>' +
                             '<td>' + list[i].price + '</td>' +
                             '<td>' + list[i].addTime + '</td>' +
+                            '<td>' + list[i].count + '</td>' +
                             '<td>' +
                             '<a id="btn-edit-' + list[i].productId + '" data-toggle="modal" href="product.html#modal-add"><button type="button" class="btn btn-outline btn-success" >修改</button></a>' +
                             '<button id="btn-delete-' + list[i].productId + '" type="button" class="btn btn-outline btn-danger">删除</button>' +
@@ -227,6 +212,7 @@
                         $("#all-product").append(html);
                         $("#btn-edit-" + list[i].productId).click(function () {
                             console.log("修改！！！" + list[i].productId);
+                            $("#productId").val(list[i].productId);
                             $("#pName").val(list[i].pName);
                             $("#price").val(list[i].price);
                             $("#addTime").val(list[i].addTime);
@@ -242,9 +228,10 @@
                         $("#btn-delete-" + list[i].productId).click(function () {
                             $.ajax({
                                 url: "/product/delete",
-                                data: "productId=" + list[i].productId,
-                                method: "post",
-                                dataType: "json",
+                                data: "{productId:" + list[i].productId + "}",
+                                method: "post", //请求方式
+                                contentType: "application/json;charset=utf-8",
+                                dataType: "json", //返回值类型
                                 success: function (result) {
                                     if (result.state == 1000) {
                                         alert("删除成功！");
@@ -328,11 +315,18 @@
         if (productId == undefined)
             url = "/product/add";
         else url = "/product/update";
-        console.log(url)
+        console.log(url);
+        var array = $("#form-add").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
+        console.log(JSON.stringify(jsonObj));
         $.ajax({
             url: url,
-            data: $("#form-add").serialize() + (productId == undefined ? "" : "&productId=" + productId),
+            data: JSON.stringify(jsonObj),
             method: "post", //请求方式
+            contentType: "application/json;charset=utf-8",
             dataType: "json", //返回值类型
             success: function (result) {
                 if (result.state == 1000) {
@@ -347,6 +341,7 @@
     });
     $("#a-add").click(function () {
         productId = undefined;
+        $("#productId").val("");
         $("#pName").val("");
         $("#price").val("");
         $("#addTime").val("");

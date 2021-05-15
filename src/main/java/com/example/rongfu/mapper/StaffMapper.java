@@ -21,12 +21,18 @@ public interface StaffMapper {
     @Delete("delete from staff where userid=#{userId}")
     Integer delete(int userId);
 
-    @Select("select * from user where userid = (select userid from staff where epid=#{epid})")
+    @Select("select * from user where userid in (select userid from staff where epid=#{epid})")
     List<User> findByEnterpriseId(int epid);
+
+    @Select("select * from staff where epid=#{epid}")
+    List<Staff> findByEpId(int epid);
 
     @Select("select * from user where username like #{username} and userid in (select userid from staff where epid=#{epid})")
     List<User> queryStaffByUserName(int epid, String username);
 
     @Select("select * from staff where userid=#{userId}")
     Staff findByUserId(int userId);
+
+    @Select("select user.* from user,staff where staff.staffid=#{staffId} and user.userid=staff.userid")
+    User findByStaffId(int staffId);
 }

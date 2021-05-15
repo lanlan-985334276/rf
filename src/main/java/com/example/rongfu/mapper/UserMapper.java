@@ -28,7 +28,7 @@ public interface UserMapper {
     @Select("select * from user where email=#{email}")
     User findByEmail(String email);
 
-    @Select("select * from user where userid=#{userid}")
+    @Select("select user.* from user where user.userid=#{userid}")
     User findByUserId(int userid);
 
     /**
@@ -49,4 +49,10 @@ public interface UserMapper {
 
     @Select("select * from user where userid not in(select userid from staff) and username like #{username}")
     List<User> findNotInEnterprise(String username);
+
+    @Update("update user set username=#{userName},email=#{email},password=#{password} where userid=#{userId}")
+    Integer updateUser(User user);
+
+    @Select("select * from user where username like #{username}")
+    List<User> findLikeUsername(String username);
 }

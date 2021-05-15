@@ -14,6 +14,10 @@ public interface IPlanService {
 
     List<Plan> findAll(int userId);
 
+    List<Plan> findAllNotFinished(int userId);
+
+    void updateState(Plan plan);
+
     List<Plan> findTodayPlan(int userId);
 
     List<Plan> findByDate(int userId, long startTime, long endTime);

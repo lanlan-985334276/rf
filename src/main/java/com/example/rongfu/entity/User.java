@@ -46,21 +46,36 @@ public class User {
 
     private int adminId;
     private int staffId;
+    private int enterpriseId;
 
     private int state;
+
+    /**
+     * 修改个人资料  新密码
+     */
+    private String password1;
+    private String password0;
     /**
      * 用于验证码登录
      */
     private String code;
 
-    private String eqName;
+    private String epName;
 
-    public String getEqName() {
-        return eqName;
+    public int getEnterpriseId() {
+        return enterpriseId;
     }
 
-    public void setEqName(String eqName) {
-        this.eqName = eqName;
+    public void setEnterpriseId(int enterpriseId) {
+        this.enterpriseId = enterpriseId;
+    }
+
+    public String getEpName() {
+        return epName;
+    }
+
+    public void setEpName(String epName) {
+        this.epName = epName;
     }
 
     public String getCode() {
@@ -72,6 +87,14 @@ public class User {
     }
 
     public User() {
+    }
+
+    public String getPassword0() {
+        return password0;
+    }
+
+    public void setPassword0(String password0) {
+        this.password0 = password0;
     }
 
     public int getState() {
@@ -194,6 +217,14 @@ public class User {
         this.date = date;
     }
 
+    public String getPassword1() {
+        return password1;
+    }
+
+    public void setPassword1(String password1) {
+        this.password1 = password1;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -211,6 +242,12 @@ public class User {
                 ", date=" + date +
                 ", adminId=" + adminId +
                 ", staffId=" + staffId +
+                ", enterpriseId=" + enterpriseId +
+                ", state=" + state +
+                ", password1='" + password1 + '\'' +
+                ", password0='" + password0 + '\'' +
+                ", code='" + code + '\'' +
+                ", epName='" + epName + '\'' +
                 '}';
     }
 }

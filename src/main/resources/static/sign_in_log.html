@@ -63,40 +63,6 @@
                     <h5>全部签到记录</h5>
                 </div>
                 <div class="ibox-content">
-                    <div class="row">
-                        <div class="col-sm-2 m-b-xs">
-                            <select class="input-sm form-control input-s-sm inline">
-                                <option value="0">请选择</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-2 m-b-xs">
-                            <div data-toggle="buttons" class="btn-group">
-                                <label class="btn btn-sm btn-white active">
-                                    <input type="radio" id="option1" name="options">天</label>
-                                <label class="btn btn-sm btn-white">
-                                    <input type="radio" id="option2" name="options">周</label>
-                                <label class="btn btn-sm btn-white">
-                                    <input type="radio" id="option3" name="options">月</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-5 m-b-xs">
-                            <div class="form-group">
-                                <input readonly class="form-control layer-date" id="hello1">
-                                <label class="laydate-icon inline demoicon"
-                                       onclick="laydate({elem: '#hello1'});"></label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="input-group">
-                                <input type="text" placeholder="请输入用户名" class="input-sm form-control"> <span
-                                    class="input-group-btn">
-                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
-                            </div>
-                        </div>
-                    </div>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <tbody id="all-log">
@@ -125,7 +91,7 @@
     $(document).ready(function () {
         $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green"});
         $.ajax({
-            url: "/signIn/todayAllSILog", //请求url
+            url: "/signIn/todaySignIn", //请求url
             data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
@@ -147,7 +113,7 @@
                             '<td>#{username}</td>' +
                             '<td>#{date}</td>' +
                             '</tr>';
-                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
+                        if (list[i].photo == undefined || list[i].photo == "") html = html.replace(/#{photo}/g, "img/profile_small.jpg");
                         else
                             html = html.replace(/#{photo}/g, list[i].photo);
                         html = html.replace(/#{username}/g, list[i].userName);
@@ -161,10 +127,11 @@
             }
         });
         $.ajax({
-            url: "/signIn/todayNotSILog", //请求url
-            data: "",
+            url: "/signIn/todayNotSignIn", //请求url
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#not-sign-in").empty();
@@ -178,7 +145,7 @@
                     for (let i = 0; i < list.length; i++) {
                         console.log(list[i].userId);
                         let html = '<tr>' +
-                            '<td><img class="img-circle m-t-xs img-responsive" src="' + list[i].photo + '" style="width: 50px;height: 50px"></td>' +
+                            '<td><img class="img-circle m-t-xs img-responsive" src="' + ((list[i].photo == undefined || list[i].photo == "") ? "img/profile_small.jpg" : list[i].photo) + '" style="width: 50px;height: 50px"></td>' +
                             '<td>' + list[i].userName + '</td>' +
                             '<td></td>' +
                             '</tr>';
@@ -191,9 +158,10 @@
         });
         $.ajax({
             url: "/signIn/allSignInLog", //请求url
-            data: "",
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#all-log").empty();
@@ -205,13 +173,14 @@
                         return;
                     }
                     for (let i = 0; i < list.length; i++) {
-                        console.log(list[i].userId);
+                        console.log(list[i].state);
                         let html = '<tr>' +
                             '<td><img class="img-circle m-t-xs img-responsive" src="#{photo}" style="width: 30px;height: 30px"></td>' +
                             '<td>#{username}</td>' +
                             '<td>#{date}</td>' +
+                            '<td>' + (list[i].state == 0 ? '未签到' : '已签到') + '</td>' +
                             '</tr>';
-                        if (list[i].photo == "") html = html.replace(/#{photo}/g, "img/bg.png");
+                        if (list[i].photo == undefined || list[i].photo == "") html = html.replace(/#{photo}/g, "img/profile_small.jpg");
                         else
                             html = html.replace(/#{photo}/g, list[i].photo);
                         html = html.replace(/#{username}/g, list[i].userName);

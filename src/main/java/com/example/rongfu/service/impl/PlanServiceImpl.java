@@ -1,8 +1,8 @@
 package com.example.rongfu.service.impl;
 
-import com.example.rongfu.entity.Plan;
-import com.example.rongfu.entity.User;
+import com.example.rongfu.entity.*;
 import com.example.rongfu.mapper.AdminMapper;
+import com.example.rongfu.mapper.EnterpriseMapper;
 import com.example.rongfu.mapper.PlanMapper;
 import com.example.rongfu.mapper.UserMapper;
 import com.example.rongfu.service.IPlanService;
@@ -10,12 +10,14 @@ import com.example.rongfu.service.ex.FailedException;
 import com.example.rongfu.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class PlanServiceImpl implements IPlanService {
 
     @Autowired
@@ -24,18 +26,46 @@ public class PlanServiceImpl implements IPlanService {
     private UserMapper userMapper;
     @Autowired
     private AdminMapper adminMapper;
+    @Autowired
+    private EnterpriseMapper enterpriseMapper;
 
     @Override
     public void add(Plan plan) {
-        String progress = "";
-        progress = "0";
-        for (int i = 1; i < plan.getStaffs().split("-").length; i++) {
-            progress += "-0";
-        }
-        plan.setProgress(progress);
-        plan.setEpId(adminMapper.findByUserId(plan.getUserId()).getEpId());
+        plan.setProgress("0");
+        Enterprise enterprise = enterpriseMapper.findByUserId(plan.getUserId());
+        Admin admin = adminMapper.findByUserId(plan.getUserId());
+        int epid = 0;
+        if (enterprise != null) {
+            epid = enterprise.getEpId();
+        } else if (admin != null) {
+            epid = admin.getEpId();
+        } else throw new FailedException("未知错误，请联系管理员");
+        plan.setEpId(epid);
+        if (planMapper.findByTitle(plan.getTitle(), plan.getEpId()) != null)
+            throw new FailedException("计划标题已占用！");
         if (planMapper.insert(plan) != 1)
             throw new FailedException("添加失败，未知插入错误，请联系管理员！");
+        List<PlanItem> items = new ArrayList<>();
+        try {
+            if (plan.getStaffs().indexOf("-") > 0) {
+                String[] userIds = plan.getStaffs().split("-");
+                for (int i = 1; i < userIds.length; i++) {
+                    PlanItem item = new PlanItem();
+                    item.setPlanId(planMapper.findByTitle(plan.getTitle(), plan.getEpId()).getPlanId());
+                    item.setUserId(Integer.valueOf(userIds[i]));
+                    item.setState(0);
+                    planMapper.insertItem(item);
+                }
+            } else {
+                PlanItem item = new PlanItem();
+                item.setPlanId(planMapper.findByTitle(plan.getTitle(), plan.getEpId()).getPlanId());
+                item.setUserId(Integer.valueOf(plan.getStaffs()));
+                item.setState(0);
+                planMapper.insertItem(item);
+            }
+        } catch (Exception e) {
+            throw new FailedException("添加失败，未知插入错误，请联系管理员！");
+        }
     }
 
     @Override
@@ -52,58 +82,42 @@ public class PlanServiceImpl implements IPlanService {
 
     @Override
     public List<Plan> findAll(int userId) {
-        List<Plan> plans = planMapper.findAll(userId);
+        Enterprise enterprise = enterpriseMapper.findByUserId(userId);
+        Admin admin = adminMapper.findByUserId(userId);
+        int epid = 0;
+        if (enterprise != null) {
+            epid = enterprise.getEpId();
+        } else if (admin != null) {
+            epid = admin.getEpId();
+        } else throw new FailedException("未知错误，请联系管理员");
+        List<Plan> plans = planMapper.findAll(epid);
         for (int i = 0; i < plans.size(); i++) {
-            List<User> users = new ArrayList<>();
-            String[] userIds = plans.get(i).getStaffs().split("-");
-            for (int j = 0; j < userIds.length; j++) {
-                try {
-                    users.add(userMapper.findByUserId(Integer.valueOf(userIds[j])));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new FailedException("未知错误，请联系管理员！");
-                }
-            }
-            String[] progressArr = plans.get(i).getProgress().split("-");
-            int progress = 0;
-            for (int j = 0; j < progressArr.length; j++) {
-                progress += Integer.valueOf(progressArr[i]);
-            }
-            plans.get(i).setUserList(users);
-            plans.get(i).setProgressNum(progress / progressArr.length * 100);
+            Plan plan = plans.get(i);
+            List<PlanItem> items = planMapper.findItem(plan.getPlanId());
+            plan.setPlanItems(items);
         }
         return plans;
     }
 
     @Override
     public List<Plan> findTodayPlan(int userId) {
-        List<Plan> list = findByDate(userId, DateUtils.getToadyDateTimeMillis(), DateUtils.getTomorrowDateTimeMills());
+        List<Plan> list = findByDate(userId,
+                DateUtils.getDailyStartTime(System.currentTimeMillis(), null),
+                DateUtils.getDailyEndTime(System.currentTimeMillis(), null));
         return list;
     }
 
     @Override
     public List<Plan> findByDate(int userId, long startTime, long endTime) {
-        List<Plan> plans = planMapper.findByDate(userId, new Timestamp(startTime), new Timestamp(endTime));
-        for (int i = 0; i < plans.size(); i++) {
-            List<User> users = new ArrayList<>();
-            String[] userIds = plans.get(i).getStaffs().split("-");
-            for (int j = 0; j < userIds.length; j++) {
-                try {
-                    users.add(userMapper.findByUserId(Integer.valueOf(userIds[j])));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new FailedException("未知错误，请联系管理员！");
-                }
-            }
-            String[] progressArr = plans.get(i).getProgress().split("-");
-            int progress = 0;
-            for (int j = 0; j < progressArr.length; j++) {
-                progress += Integer.valueOf(progressArr[i]);
-                users.get(i).setState(progress);
-            }
-            plans.get(i).setUserList(users);
-            plans.get(i).setProgressNum(progress / progressArr.length * 100);
-        }
+        Enterprise enterprise = enterpriseMapper.findByUserId(userId);
+        Admin admin = adminMapper.findByUserId(userId);
+        int epid = 0;
+        if (enterprise != null) {
+            epid = enterprise.getEpId();
+        } else if (admin != null) {
+            epid = admin.getEpId();
+        } else throw new FailedException("未知错误，请联系管理员");
+        List<Plan> plans = planMapper.findByDate(epid, new Timestamp(startTime), new Timestamp(endTime));
         return plans;
     }
 
@@ -151,5 +165,33 @@ public class PlanServiceImpl implements IPlanService {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<Plan> findAllNotFinished(int userId) {
+        List<Plan> plans = null;
+        try {
+            List<PlanItem> items = planMapper.findByUserId(userId);
+            plans = new ArrayList<>();
+            for (PlanItem item : items) {
+                Plan plan = planMapper.findByPlanId(item.getPlanId());
+                plans.add(plan);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return plans;
+    }
+
+    @Override
+    public void updateState(Plan plan) {
+        System.out.println(plan);
+        PlanItem planItem = planMapper.findByUidAndPiId(plan);
+        System.out.println(planItem);
+        if (planMapper.updateItem(planItem.getPiId()) != 1) throw new FailedException("提交失败！");
+        int sum = planMapper.findCount(plan.getPlanId());
+        int progress = (int) ((sum - planMapper.findNotCount(plan.getPlanId())) * 1d / (sum * 1d) * 100);
+        plan.setProgress(Integer.toString(progress));
+        if (planMapper.updateProgress(plan) != 1) throw new FailedException("提交失败！");
     }
 }

@@ -4,6 +4,7 @@ import com.example.rongfu.entity.*;
 import com.example.rongfu.mapper.*;
 import com.example.rongfu.service.IUserService;
 import com.example.rongfu.service.ex.*;
+import com.example.rongfu.util.DateUtils;
 import com.example.rongfu.util.SendMessageUtils;
 import com.example.rongfu.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -26,28 +28,30 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private EnterpriseMapper enterpriseMapper;
     @Autowired
-    private VerificationCodeMapper codeMapper;
-    @Autowired
     private AdminMapper adminMapper;
     @Autowired
     private StaffMapper staffMapper;
+    @Autowired
+    private VerificationCodeMapper codeMapper;
 
     @Autowired
     private SignInMapper signInMapper;
+    @Autowired
+    private StepMapper stepMapper;
 
     @Override
     public void regEp(User user) {
         User result = reg(user);
 
         //判断企业是否已注册
-        if (enterpriseMapper.findByName(user.getEqName()) != null)
+        if (enterpriseMapper.findByName(user.getEpName()) != null)
             throw new UserNameErrorException("注册失败，企业已注册！");
         Integer rows = userMapper.insert(result);
         if (rows != 1) {
             throw new InsertException("注册失败，未知插入错误！请联系管理员!");
         } else result.setUserId(userMapper.findByUserName(user.getUserName()).getUserId());
         Enterprise enterprise = new Enterprise();
-        enterprise.setEpName(user.getEqName());
+        enterprise.setEpName(user.getEpName());
         enterprise.setUserId(result.getUserId());
         enterprise.setTime(new Timestamp(new Date().getTime()));
         //调用userMapper的insert方法进行插入
@@ -109,11 +113,14 @@ public class UserServiceImpl implements IUserService {
         }
         Enterprise enterprise = enterpriseMapper.findByUserId(result.getUserId());
         Admin admin = adminMapper.findByUserId(result.getUserId());
-
         if (enterprise != null) {
+            result.setEnterpriseId(enterprise.getEpId());
             result.setEnterprise(true);
+            addSignInLog(enterprise.getEpId());
         } else if (admin != null) {
             result.setAdmin(true);
+            result.setEnterpriseId(admin.getEpId());
+            addSignInLog(admin.getEpId());
         } else
             throw new AdminNotFoundException("没有权限，请联系您的企业管理员！");
         //返回登录者的用户信息
@@ -121,6 +128,14 @@ public class UserServiceImpl implements IUserService {
         if (userMapper.updateLastLoginTime(result) != 1)
             throw new FailedException("登录失败，未知错误，请联系管理员！");
         codeMapper.deleteByUserName(user.getUserName());
+        if (stepMapper.findByUserId(result.getUserId()) == null) {
+            Step step = new Step();
+            step.setEpId(result.getEnterpriseId());
+            step.setUserId(result.getUserId());
+            step.setNum(0);
+            step.setUserName(result.getUserName());
+            stepMapper.insert(step);
+        }
         return result;
     }
 
@@ -140,6 +155,32 @@ public class UserServiceImpl implements IUserService {
         if (vCode.size() == 0 || !vCode.get(vCode.size() - 1).getVerificationCode().equals(code))
             throw new VerificationCodeErrorException("验证码错误！");
         codeMapper.deleteByUserName(userName);
+        Enterprise enterprise = enterpriseMapper.findByUserId(result.getUserId());
+        Admin admin = adminMapper.findByUserId(result.getUserId());
+        Staff staff = staffMapper.findByUserId(result.getUserId());
+        if (enterprise != null) {
+            result.setEnterpriseId(enterprise.getEpId());
+            result.setEnterprise(true);
+            addSignInLog(enterprise.getEpId());
+        } else if (admin != null) {
+            result.setAdmin(true);
+            result.setEnterpriseId(admin.getEpId());
+            addSignInLog(admin.getEpId());
+        } else if (staff != null) {
+            result.setEnterpriseId(staff.getEpId());
+            addSignInLog(staff.getEpId());
+        } else throw new FailedException("您没有权限登录，请联系企业管理员！");
+        result.setLastLoginTime(new Timestamp(new Date().getTime()));
+        if (userMapper.updateLastLoginTime(result) != 1)
+            throw new FailedException("登录失败，未知错误，请联系管理员！");
+        if (stepMapper.findByUserId(result.getUserId()) == null) {
+            Step step = new Step();
+            if (result.getEnterpriseId() > 0) step.setEpId(result.getEnterpriseId());
+            step.setUserId(result.getUserId());
+            step.setNum(0);
+            step.setUserName(result.getUserName());
+            stepMapper.insert(step);
+        }
         return result;
     }
 
@@ -200,8 +241,27 @@ public class UserServiceImpl implements IUserService {
     @Override
     public List<User> queryUserToAdd(User user) {
         //查找所有不存在于staff的用户
-        List<User> users = userMapper.findNotInEnterprise("%" + user.getUserName() + "%");
-        return users;
+        List<User> users=userMapper.findLikeUsername("%" + user.getUserName() + "%");
+        List<User> results=new ArrayList<>();
+        results.addAll(users);
+        for (User u:users){
+            System.out.println(u);
+            if (enterpriseMapper.findByUserId(u.getUserId())!=null) {
+                results.remove(u);
+            }
+        }
+        /*List<User> users = userMapper.findNotInEnterprise("%" + user.getUserName() + "%");
+        List<User> results=new ArrayList<>();
+        results.addAll(users);
+        System.out.println(results.size());
+        for (User u:users){
+            System.out.println(u);
+            if (enterpriseMapper.findByUserId(user.getUserId())!=null) {
+                results.remove(u);
+            }
+        }*/
+        System.out.println(results.size());
+        return results;
     }
 
     @Override
@@ -221,6 +281,7 @@ public class UserServiceImpl implements IUserService {
         try {
             if (staffMapper.insert(staff) != 1)
                 throw new FailedException("添加失败，未知插入错误！");
+            addSignInLog(staff.getEpId());
         } catch (Exception e) {
             e.printStackTrace();
             throw new FailedException("添加失败，未知插入错误！");
@@ -302,17 +363,32 @@ public class UserServiceImpl implements IUserService {
         }
         Enterprise enterprise = enterpriseMapper.findByUserId(result.getUserId());
         Admin admin = adminMapper.findByUserId(result.getUserId());
-
+        Staff staff = staffMapper.findByUserId(result.getUserId());
         if (enterprise != null) {
+            result.setEnterpriseId(enterprise.getEpId());
             result.setEnterprise(true);
+            addSignInLog(enterprise.getEpId());
         } else if (admin != null) {
             result.setAdmin(true);
-        }
+            result.setEnterpriseId(admin.getEpId());
+            addSignInLog(admin.getEpId());
+        } else if (staff != null) {
+            result.setEnterpriseId(staff.getEpId());
+            addSignInLog(staff.getEpId());
+        } else throw new FailedException("您没有权限登录，请联系企业管理员！");
         //返回登录者的用户信息
         result.setLastLoginTime(new Timestamp(new Date().getTime()));
         if (userMapper.updateLastLoginTime(result) != 1)
             throw new FailedException("登录失败，未知错误，请联系管理员！");
         codeMapper.deleteByUserName(user.getUserName());
+        if (stepMapper.findByUserId(result.getUserId()) == null) {
+            Step step = new Step();
+            if (result.getEnterpriseId() > 0) step.setEpId(result.getEnterpriseId());
+            step.setUserId(result.getUserId());
+            step.setNum(0);
+            step.setUserName(result.getUserName());
+            stepMapper.insert(step);
+        }
         return result;
     }
 
@@ -328,5 +404,41 @@ public class UserServiceImpl implements IUserService {
         if (vCode.size() > 0)
             codeMapper.delete(vCode.get(vCode.size() - 1).getVcId());
         return user;
+    }
+
+    private void addSignInLog(int epid) {
+        long current = System.currentTimeMillis();
+
+        Timestamp startTime = new Timestamp(DateUtils.getDailyStartTime(current, null));
+        Timestamp endTime = new Timestamp(DateUtils.getDailyEndTime(current, null));
+        System.out.println(startTime + " " + endTime);
+        List<SignIn> signIns = signInMapper.findByEpidAndTime(epid, startTime, endTime);
+        if (signIns.size() != 0) return;
+        try {
+            List<Staff> staffs = staffMapper.findByEpId(epid);
+            for (Staff staff : staffs) {
+                SignIn signIn = new SignIn();
+                signIn.setStaffId(staff.getStaffId());
+                signIn.setEpid(staff.getEpId());
+                signIn.setState(0);
+                signIn.setDate(startTime);
+                signInMapper.insert(signIn);
+            }
+        } catch (Exception e) {
+            throw new FailedException("未知错误，请尝试重新登录！");
+        }
+    }
+
+    @Override
+    public void updateUser(User user) {
+        System.out.println(user);
+        if (user.getPassword0()!=null && !user.getPassword0().isEmpty()){
+            if (!userMapper.findByUserId(user.getUserId()).getPassword().equals(user.getPassword0())) {
+                throw new FailedException("原始密码错误！");
+            }
+            user.setPassword(user.getPassword1());
+        }
+
+        if (userMapper.updateUser(user) != 1) throw new FailedException("更新失败，请联系管理员！");
     }
 }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/projects.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:44 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 账单汇总</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+    <script src="js/plugins/layer/laydate/laydate.js"></script>
+
+
+</head>
+
+<body class="gray-bg">
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>账单汇总</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-1">
+                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i
+                                    class="fa fa-refresh"></i> 刷新
+                            </button>
+                        </div>
+                        <!--<div class="col-md-11">
+                            <div class="input-group">
+                                <input type="text" placeholder="请输入计划名" class="input-sm form-control"> <span
+                                    class="input-group-btn">
+                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
+                            </div>
+                        </div>-->
+                    </div>
+                    <div class="row m-b-sm m-t-sm middle-box" style="margin-top: 20px;" id="summery">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/content.min.js?v=1.0.0"></script>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "/index/summary", //请求url
+            data: "{}",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#summery").append('总出库金额：' + result.data.purchase + '元<br>' +
+                        '总入库金额：' + result.data.delivery + '元<br>' +
+                        '总退货金额：' + result.data.returnGoods + '元<br>');
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+    $("#loading-example-btn").click(function () {
+        location.reload();
+    });
+</script>
+</body>
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/projects.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:44 GMT -->
+</html>

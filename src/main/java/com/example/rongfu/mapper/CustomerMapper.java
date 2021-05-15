@@ -9,26 +9,29 @@ import java.util.List;
 @Mapper
 public interface CustomerMapper {
 
-    @Insert("insert into customer(cname,photo,address,phone,userid,content,addtime,contact) " +
-            "values(#{cName},#{photo},#{address},#{phone},#{userId},#{content},#{addTime},#{contact})")
+    @Insert("insert into customer(cname,photo,address,phone,epid,content,addtime,contact) " +
+            "values(#{cName},#{photo},#{address},#{phone},#{epid},#{content},#{addTime},#{contact})")
     Integer insert(Customer customer);
 
     @Update("update customer set cname=#{cName}," +
             "photo=#{photo}," +
             "addTime=#{addTime},address=#{address}," +
             "phone=#{phone},contact=#{contact}," +
-            "content=#{content},userid=#{userId} where customerid=#{customerId}")
+            "content=#{content},epid=#{epid} where customerid=#{customerId}")
     Integer update(Customer customer);
 
     @Delete("delete from customer where customerid=#{customerId}")
     Integer delete(int customerId);
 
-    @Select("select * from customer where userid in(select userid from admin where epid=(select epid from admin where userid=#{userId}))")
-    List<Customer> findAll(int userId);
+    @Select("select * from customer where epid=#{epid}")
+    List<Customer> findAll(int epid);
 
     @Select("select * from customer where cname like cName")
     Product findByPName(String cName);
 
     @Select("select * from customer where productid=#{productId}")
     Product findByProductId(int productId);
+
+    @Select("select * from customer where customerid=#{customerId}")
+    Customer findById(int customerId);
 }

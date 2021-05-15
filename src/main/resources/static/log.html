@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 工作日志管理</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+    <script src="js/jquery.min.js?v=2.1.4"></script>
+    <script src="js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="js/content.min.js?v=1.0.0"></script>
+    <script src="js/plugins/validate/jquery.validate.min.js"></script>
+    <script src="js/plugins/validate/messages_zh.min.js"></script>
+    <script src="js/demo/form-validate-demo.min.js"></script>
+    <script src="js/plugins/layer/laydate/laydate.js"></script>
+    <script src="js/plugins/ckeditor/ckeditor.js"></script>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>工作日志管理</h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>用户名</th>
+                            <th>标题</th>
+                            <th>内容</th>
+                            <th>提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="all-product">
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal-add" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form class="form-horizontal m-t" id="form-add">
+                            <input id="productId" name="productId" type="hidden">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">用户名：</label>
+                                <div class="col-sm-8">
+                                    <input id="userName" name="userName" class="form-control" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">标题：</label>
+                                <div class="col-sm-8">
+                                    <input id="title" name="title" class="form-control" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">内容：</label>
+                                <div class="col-sm-8">
+                                    <input id="content" name="content" class="form-control" type="text"
+                                           aria-required="true"
+                                           aria-invalid="false" class="valid" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">提交时间：</label>
+                                <div class="col-sm-8">
+                                    <input id="addTime" name="time" class="form-control" type="text" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-sm-offset-3">
+                                    <button id="btn-add" class="btn btn-primary" type="button">确定</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: "/log/all",
+            data: "{}",
+            method: "post", //请求方式
+            contentType: "application/json;charset=utf-8",
+            dataType: "json", //返回值类型
+            success: function (result) {
+                if (result.state == 1000) {
+                    let list = result.data;
+                    console.log("count=" + list.length);
+                    if (list.length == 0) {
+                        let h = '<h3 class="middle-box">暂无数据</h3>';
+                        $("#all-product").append(h);
+                        return;
+                    }
+                    for (let i = 0; i < list.length; i++) {
+                        let html = '<tr>' +
+                            '<td>' + list[i].logId + '</td>' +
+                            '<td>' + list[i].userName + '</td>' +
+                            '<td>' + list[i].title + '</td>' +
+                            '<td>' + list[i].content + '</td>' +
+                            '<td>' + list[i].addTime + '</td>' +
+                            '<td>' +
+                            '<a id="btn-find-' + list[i].logId + '" data-toggle="modal" href="product.html#modal-add"><button type="button" class="btn btn-outline btn-success" >查看</button></a>' +
+                            '<button id="btn-delete-' + list[i].logId + '" type="button" class="btn btn-outline btn-danger">删除</button>' +
+                            '</td>' +
+                            '</tr>';
+                        $("#all-product").append(html);
+                        $("#btn-find-" + list[i].logId).click(function () {
+                            $("#title").val(list[i].title);
+                            $("#userName").val(list[i].userName);
+                            $("#content").val(list[i].content);
+                            $("#addTime").val(list[i].addTime);
+                        });
+                        $("#btn-delete-" + list[i].logId).click(function () {
+                            $.ajax({
+                                url: "/log/delete",
+                                data: "{logId:" + list[i].logId + "}",
+                                method: "post", //请求方式
+                                contentType: "application/json;charset=utf-8",
+                                dataType: "json", //返回值类型
+                                success: function (result) {
+                                    if (result.state == 1000) {
+                                        alert("删除成功！");
+                                        location.reload();
+                                    } else alert(result.message);
+                                }
+                            });
+                        });
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+    $("#btn-add").click(function () {
+        $("#modal-add").modal('hide');
+    });
+</script>
+</html>

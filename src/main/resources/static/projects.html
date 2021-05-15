@@ -44,13 +44,6 @@
                                     class="fa fa-refresh"></i> 刷新
                             </button>
                         </div>
-                        <div class="col-md-11">
-                            <div class="input-group">
-                                <input type="text" placeholder="请输入计划名" class="input-sm form-control"> <span
-                                    class="input-group-btn">
-                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="project-list">
@@ -100,7 +93,7 @@
                                 <div class="col-sm-8">
                                     <input id="staffs" name="staffs" type="hidden">
                                     <select class="form-control m-b" id="add-userId">
-
+                                        
                                     </select>
                                 </div>
                             </div>
@@ -138,10 +131,11 @@
 
     function getStaffs() {
         $.ajax({
-            url: "/users/queryStaff", //请求url
-            data: "",
+            url: "/users/queryAllStaff", //请求url
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#add-userId").empty();
@@ -162,9 +156,10 @@
         getStaffs();
         $.ajax({
             url: "/plan/all",
-            data: "",
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) {
                 if (result.state == 1000) {
                     $("#all").empty();
@@ -185,23 +180,24 @@
                             '<small>创建于 ' + list[i].addTime + '</small>' +
                             '</td>' +
                             '<td class="project-completion">' +
-                            '<small>当前进度： ' + list[i].progressNum + '%</small>' +
+                            '<small>当前进度： ' + list[i].progress + '%</small>' +
                             '<div class="progress progress-mini">' +
-                            '<div style="width: ' + list[i].progressNum + '%;" class="progress-bar"></div>' +
+                            '<div style="width: ' + list[i].progress + '%;" class="progress-bar"></div>' +
                             '</div>' +
                             '</td>' +
                             '<td class="project-actions">' +
-                            '<a id="btn-delete-' + list[i].planId + '" href="#" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i>' +
-                            ' 删除 </a>' +
+                            '<button id="btn-delete-' + list[i].planId + '" href="#" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i>' +
+                            ' 删除 </button>' +
                             '</td>' +
                             '</tr>';
                         $("#all").append(html);
                         $("#btn-delete-" + list[i].planId).click(function () {
                             $.ajax({
-                                url: "/user/delete", //请求url
-                                data: "planId=" + list[i].planId,
+                                url: "/plan/delete", //请求url
+                                data: "{planId:" + list[i].planId+"}",
                                 method: "post", //请求方式
                                 dataType: "json", //返回值类型
+                                contentType: "application/json;charset=utf-8",
                                 success: function (result) { //服务器成功返回时，执行的匿名函数
                                     if (result.state == 1000) {
                                         alert("删除成功！");
@@ -243,11 +239,18 @@
             alert("请选择参与员工！")
             return;
         }
+        var array = $("#form-add").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
+        console.log(JSON.stringify(jsonObj));
         $.ajax({
             url: "/plan/add",
-            data: $("#form-add").serialize(),
+            data: JSON.stringify(jsonObj),
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) {
                 if (result.state == 1000) {
                     $("#modal-add").modal('hide');
@@ -273,14 +276,15 @@
         var userId = $("#add-userId").val();
         $.ajax({
             url: "/users/findByUserId", //请求url
-            data: "userId=" + userId,
+            data: "{userId=" + userId+"}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#staffs-img").append('' +
                         '<tr>' +
-                        '<td><img src="' + result.data.photo + '" class="img-circle" style="width: 30px;height: 30px;">' +
+                        '<td><img src="img/profile_small.jpg" class="img-circle" style="width: 30px;height: 30px;">' +
                         '</td>' +
                         '<td>' + result.data.userName + '</td>' +
                         '</tr>');

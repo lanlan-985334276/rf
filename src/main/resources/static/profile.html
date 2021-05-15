@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>RF - 个人资料</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+    <script src="js/jquery.min.js?v=2.1.4"></script>
+    <script src="js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="js/content.min.js?v=1.0.0"></script>
+    <script src="js/plugins/validate/jquery.validate.min.js"></script>
+    <script src="js/plugins/validate/messages_zh.min.js"></script>
+    <script src="js/demo/form-validate-demo.min.js"></script>
+    <script src="js/plugins/layer/laydate/laydate.js"></script>
+    <script src="js/plugins/ckeditor/ckeditor.js"></script>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>个人资料</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form class="form-horizontal m-t" id="form-add">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">用户名：</label>
+                                    <div class="col-sm-8">
+                                        <input id="userName" name="userName" class="form-control" type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">邮箱：</label>
+                                    <div class="col-sm-8">
+                                        <input id="email" name="email" class="form-control" type="text">
+                                    </div>
+                                </div>
+                                <input id="password" name="password" type="hidden">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">原始密码：</label>
+                                    <div class="col-sm-8">
+                                        <input id="password0" name="password0" class="form-control" type="password">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">新密码：</label>
+                                    <div class="col-sm-8">
+                                        <input id="password1" name="password1" class="form-control" type="password">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">确认密码：</label>
+                                    <div class="col-sm-8">
+                                        <input id="password2" name="password2" class="form-control" type="password">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-8 col-sm-offset-3">
+                                        <button id="btn-sure" class="btn btn-primary" type="button">修改</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: "/index/getUser", //请求url
+            data: "{}",
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    $("#userName").val(result.data.userName);
+                    $("#email").val(result.data.email);
+                    $("#password").val(result.data.password);
+                } else {
+                    alert(result.message);
+                    location.href = "login.html"
+                }
+            }
+        })
+    });
+    $("#btn-sure").click(function () {
+        if ($("#userName").val() == "") {
+            alert("用户名不能为空！");
+            return;
+        }
+        if ($("#email").val() == "") {
+            alert("邮箱不能为空！");
+            return;
+        }
+        var password0 = $("#password0").val();
+        var password1 = $("#password1").val();
+        var password2 = $("#password2").val();
+        if (password0 != "" || password1 != "" || password2 != "") {
+            if (password0 == "") {
+                alert("原始密码不能为空！");
+                return;
+            }
+            if (password1 == "") {
+                alert("新密码不能为空！");
+                return;
+            }
+            if (password2 !=password1) {
+                alert("两次输入的密码不一致！");
+                return;
+            }
+        }
+        var array = $("#form-add").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
+        $.ajax({
+            url: "/users/updateUser", //请求url
+            data: JSON.stringify(jsonObj),
+            method: "post", //请求方式
+            dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
+            success: function (result) { //服务器成功返回时，执行的匿名函数
+                if (result.state == 1000) {
+                    parent.location.reload();
+                } else {
+                    alert(result.message);
+                }
+            }
+        })
+    });
+</script>
+</html>

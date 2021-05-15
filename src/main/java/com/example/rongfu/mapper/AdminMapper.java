@@ -18,8 +18,8 @@ import java.util.List;
 @Mapper
 public interface AdminMapper {
 
-    @Select("select user.*,admin.adminId from user,admin where epid=(select epid from admin where userid=#{userId}) and admin.userid=user.userid and admin.userid!=#{userId}")
-    List<User> findAll(int userId);
+    @Select("select user.*,admin.adminId from user,admin where admin.epid=#{epid} and admin.userid=user.userid")
+    List<User> findAll(int epid);
 
     @Select("select user.* from user,staff where staff.epid=(select epid from admin where userid=#{userId}) and staff.userid=user.userid and staff.userid not in(select userid from admin)")
     List<User> findOther(int userId);

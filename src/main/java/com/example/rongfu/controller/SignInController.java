@@ -1,5 +1,6 @@
 package com.example.rongfu.controller;
 
+import com.example.rongfu.entity.SignIn;
 import com.example.rongfu.entity.User;
 import com.example.rongfu.service.ISignInService;
 import com.example.rongfu.util.JsonResult;
@@ -19,21 +20,25 @@ public class SignInController extends BaseController {
     @Autowired
     private ISignInService signInService;
 
-    @RequestMapping("/todayNotSILog")
-    JsonResult<List<User>> todayNot(HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    @RequestMapping("/todayNotSignIn")
+    JsonResult<List<User>> todayNotSignIn(@RequestBody String userStr, HttpSession session) {
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = JsonUtils.json2User(userStr).getUserId();
         List<User> list = signInService.ToadyNotSignIn(userId);
         return new JsonResult<>(OK, list);
     }
 
     /**
      * 今日已签到
+     *
      * @param userStr
      * @param session
      * @return
      */
-    @RequestMapping("/todayAllSILog")
-    JsonResult<List<User>> todayAll(@RequestBody String userStr, HttpSession session) {
+    @RequestMapping("/todaySignIn")
+    JsonResult<List<User>> todaySignIn(@RequestBody String userStr, HttpSession session) {
         int userId = 0;
         if (session != null)
             userId = Integer.valueOf(session.getAttribute("userId").toString());
@@ -43,9 +48,19 @@ public class SignInController extends BaseController {
     }
 
     @RequestMapping("/allSignInLog")
-    JsonResult<List<User>> allSignInLog(HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    JsonResult<List<User>> allSignInLog(@RequestBody String userStr, HttpSession session) {
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = JsonUtils.json2User(userStr).getUserId();
         List<User> list = signInService.findAll(userId);
         return new JsonResult<>(OK, list);
+    }
+
+    @RequestMapping("/signIn")
+    JsonResult<Void> signIn(@RequestBody String signInStr) {
+        SignIn signIn = JsonUtils.json2SignIn(signInStr);
+        signInService.SignIn(signIn);
+        return new JsonResult<>(OK);
     }
 }

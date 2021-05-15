@@ -43,24 +43,6 @@
                                 <a id="a-add" data-toggle="modal" class="btn btn-primary" href="product.html#modal-add">添加</a>
                             </div>
                         </div>
-                        <div class="col-sm-2 m-b-xs">
-                            <select class="input-sm form-control input-s-sm inline" id="all-pcId" name="pcId">
-                            </select>
-                        </div>
-                        <div class="col-sm-5 m-b-xs">
-                            <div class="form-group">
-                                <input readonly class="form-control layer-date" id="hello1">
-                                <label class="laydate-icon inline demoicon"
-                                       onclick="laydate({elem: '#hello1'});"></label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="input-group">
-                                <input type="text" placeholder="请输入客户名" class="input-sm form-control"> <span
-                                    class="input-group-btn">
-                                        <button type="button" class="btn btn-sm btn-primary"> 搜索</button> </span>
-                            </div>
-                        </div>
                     </div>
                     <table class="table">
                         <thead>
@@ -91,6 +73,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <form class="form-horizontal m-t" id="form-add">
+                            <input id="customerId" name="customerId" type="hidden">
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-8">
@@ -156,10 +139,6 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-8">
-                                    <!--<textarea id="content" name="content"></textarea>
-                                    <script type="text/javascript">
-                                        CKEDITOR.replace('content');
-                                    </script>-->
 
                                 </div>
                             </div>
@@ -183,9 +162,10 @@
     $(document).ready(function () {
         $.ajax({
             url: "/customer/all", //请求url
-            data: "",
+            data: "{}",
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) { //服务器成功返回时，执行的匿名函数
                 if (result.state == 1000) {
                     $("#all-customer").empty();
@@ -215,6 +195,7 @@
                         $("#btn-edit-" + list[i].customerId).click(function () {
                             console.log("修改！！！" + list[i].customerId);
                             $("#cName").val(list[i].cName);
+                            $("#customerId").val(list[i].customerId);
                             $("#address").val(list[i].address);
                             $("#addTime").val(list[i].addTime);
                             $("#phone").val(list[i].phone);
@@ -230,9 +211,10 @@
                         $("#btn-delete-" + list[i].customerId).click(function () {
                             $.ajax({
                                 url: "/customer/delete",
-                                data: "customerId=" + list[i].customerId,
+                                data: "{customerId:" + list[i].customerId+"}",
                                 method: "post",
                                 dataType: "json",
+                                contentType: "application/json;charset=utf-8",
                                 success: function (result) {
                                     if (result.state == 1000) {
                                         alert("删除成功！");
@@ -321,12 +303,19 @@
         if (customerId == undefined)
             url = "/customer/add";
         else url = "/customer/update";
-        console.log(url)
+        console.log(url);
+        var array = $("#form-add").serializeArray();
+        var jsonObj = {};
+        $(array).each(function () {
+            jsonObj[this.name] = this.value;
+        });
+        console.log(JSON.stringify(jsonObj));
         $.ajax({
             url: url,
-            data: $("#form-add").serialize() + (customerId == undefined ? "" : "&customerId=" + customerId),
+            data: JSON.stringify(jsonObj),
             method: "post", //请求方式
             dataType: "json", //返回值类型
+            contentType: "application/json;charset=utf-8",
             success: function (result) {
                 if (result.state == 1000) {
                     $("#modal-add").modal('hide');
@@ -340,6 +329,7 @@
     });
     $("#a-add").click(function () {
         customerId = undefined;
+        $("#customerId").val("");
         $("#cName").val("");
         $("#contact").val("");
         $("#addTime").val("");

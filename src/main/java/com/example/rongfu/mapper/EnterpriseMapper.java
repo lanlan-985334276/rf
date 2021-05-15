@@ -41,4 +41,5 @@ public interface EnterpriseMapper {
 
     @Delete("delete from enterprise where epid=#{epid}")
     Integer delete(int epid);
+
 }

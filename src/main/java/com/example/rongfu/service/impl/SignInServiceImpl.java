@@ -1,27 +1,24 @@
 package com.example.rongfu.service.impl;
 
-import com.example.rongfu.entity.Admin;
-import com.example.rongfu.entity.Enterprise;
-import com.example.rongfu.entity.User;
+import com.example.rongfu.entity.*;
 import com.example.rongfu.mapper.AdminMapper;
 import com.example.rongfu.mapper.EnterpriseMapper;
 import com.example.rongfu.mapper.SignInMapper;
+import com.example.rongfu.mapper.StaffMapper;
 import com.example.rongfu.service.ISignInService;
 import com.example.rongfu.service.ex.FailedException;
 import com.example.rongfu.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sun.rmi.runtime.Log;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 public class SignInServiceImpl implements ISignInService {
 
     @Autowired
@@ -32,6 +29,8 @@ public class SignInServiceImpl implements ISignInService {
 
     @Autowired
     private AdminMapper adminMapper;
+    @Autowired
+    private StaffMapper staffMapper;
 
     @Override
     public List<User> ToadySignIn(int userId) {
@@ -45,7 +44,7 @@ public class SignInServiceImpl implements ISignInService {
         try {
             Timestamp startTime = new Timestamp(DateUtils.getToadyDateTimeMillis());
             Timestamp endTime = new Timestamp(DateUtils.getTomorrowDateTimeMills());
-            list.addAll(signInMapper.findTodaySignIn(enterprise.getEpId(), startTime, endTime));
+            list.addAll(signInMapper.findSignInByEpidAndTime(enterprise.getEpId(), startTime, endTime));
         } catch (Exception e) {
             e.printStackTrace();
             throw new FailedException("未知错误，请联系管理员！");
@@ -56,13 +55,17 @@ public class SignInServiceImpl implements ISignInService {
     @Override
     public List<User> ToadyNotSignIn(int userId) {
         Enterprise enterprise = enterpriseMapper.findByUserId(userId);
-        if (enterprise == null)
-            throw new FailedException("未知错误，请重新登录！");
+        if (enterprise == null) {
+            Admin admin = adminMapper.findByUserId(userId);
+            if (admin != null) enterprise = enterpriseMapper.findByEpId(admin.getEpId());
+            else throw new FailedException("未知错误，请重新登录！");
+        }
         List<User> list = new ArrayList<>();
         try {
-            Timestamp startTime = new Timestamp(DateUtils.getToadyDateTimeMillis());
-            Timestamp endTime = new Timestamp(DateUtils.getTomorrowDateTimeMills());
-            list.addAll(signInMapper.findToadyNotSignIn(enterprise.getEpId(), startTime, endTime));
+            Timestamp startTime = new Timestamp(DateUtils.getDailyStartTime(System.currentTimeMillis(), null));
+            Timestamp endTime = new Timestamp(DateUtils.getDailyEndTime(System.currentTimeMillis(), null));
+            System.out.println(startTime + " " + endTime);
+            list.addAll(signInMapper.findNotSignInByEpidAndTime(enterprise.getEpId(), startTime, endTime));
         } catch (Exception e) {
             e.printStackTrace();
             throw new FailedException("未知错误，请联系管理员！");
@@ -72,15 +75,30 @@ public class SignInServiceImpl implements ISignInService {
     }
 
     @Override
-    public void SignIn(int staffId) {
-
+    public void SignIn(SignIn signIn) {
+        signIn.setDate(new Timestamp(System.currentTimeMillis()));
+        Timestamp startTime = new Timestamp(DateUtils.getDailyStartTime(System.currentTimeMillis(), null));
+        Timestamp endTime = new Timestamp(DateUtils.getDailyEndTime(System.currentTimeMillis(), null));
+        List<SignIn> signIns = signInMapper.findByEpidAndTime(signIn.getEpid(), startTime, endTime);
+        for (SignIn s : signIns) {
+            System.out.println(s.getStaffId()+" "+signIn.getStaffId());
+            if (s.getStaffId() == signIn.getStaffId()) {
+                System.out.println(signIn);
+                signIn.setSiId(s.getSiId());
+                if (signInMapper.update(signIn) != 1) throw new FailedException("签到失败！");
+                return;
+            }
+        }
     }
 
     @Override
     public List<User> findAll(int userId) {
         Enterprise enterprise = enterpriseMapper.findByUserId(userId);
-        if (enterprise == null)
-            throw new FailedException("未知错误，请重新登录！");
+        if (enterprise == null) {
+            Admin admin = adminMapper.findByUserId(userId);
+            if (admin != null) enterprise = enterpriseMapper.findByEpId(admin.getEpId());
+            else throw new FailedException("未知错误，请重新登录！");
+        }
         return signInMapper.findAllByEpId(enterprise.getEpId());
     }
 }

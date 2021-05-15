@@ -100,7 +100,7 @@ public class UserController extends BaseController {
     @RequestMapping("/addStaff")
     JsonResult<Void> addStaff(@RequestBody String staffStr, HttpSession session) {
         Staff staff = JsonUtils.json2Staff(staffStr);
-        if (session != null)
+        if (session != null && session.getAttribute("userId") != null)
             staff.setmUserId(Integer.valueOf(session.getAttribute("userId").toString()));
         userService.addStaff(staff.getmUserId(), staff.getUserId());
         return new JsonResult<>(OK);
@@ -144,7 +144,7 @@ public class UserController extends BaseController {
     @RequestMapping("/queryStaffByUserName")
     JsonResult<List<User>> queryStaffByUserName(@RequestBody String userStr, HttpSession session) {
         User user = JsonUtils.json2User(userStr);
-        if (session != null)
+        if (session != null && session.getAttribute("userId") != null)
             user.setUserId(Integer.valueOf(session.getAttribute("userId").toString()));
         return new JsonResult<>(OK, userService.queryStaffByUserName(user.getUserId(), user.getUserName()));
     }
@@ -152,11 +152,12 @@ public class UserController extends BaseController {
     /**
      * 根据用户ID查找
      *
-     * @param user
+     * @param
      * @return
      */
     @RequestMapping("/findByUserId")
-    JsonResult<User> queryStaff(User user) {
+    JsonResult<User> queryStaff(@RequestBody String userStr) {
+        User user = JsonUtils.json2User(userStr);
         return new JsonResult<>(OK, userService.findByUserId(user.getUserId()));
     }
 
@@ -191,5 +192,16 @@ public class UserController extends BaseController {
     @RequestMapping("/regOther")
     JsonResult<User> regOther(@RequestBody String userStr) {
         return new JsonResult<>(OK, userService.regOther(JsonUtils.json2User(userStr)));
+    }
+
+    @RequestMapping("/updateUser")
+    JsonResult<Void> updateUser(@RequestBody String userStr, HttpSession session) {
+        System.out.println(userStr);
+        User user = JsonUtils.json2User(userStr);
+        if (session != null && session.getAttribute("userId") != null)
+            user.setUserId(Integer.valueOf(session.getAttribute("userId").toString()));
+        System.out.println(user==null);
+        userService.updateUser(user);
+        return new JsonResult<>(OK);
     }
 }

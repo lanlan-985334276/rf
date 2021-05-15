@@ -43,4 +43,6 @@ public interface IUserService {
     User equalsCode(User user);
     User loginApp(User user);
     User regOther(User user);
+
+    void updateUser(User user);
 }

@@ -4,6 +4,15 @@ public class Admin {
     private int adminId;
     private int userId;
     private int epId;
+    private int mUserId;
+
+    public int getmUserId() {
+        return mUserId;
+    }
+
+    public void setmUserId(int mUserId) {
+        this.mUserId = mUserId;
+    }
 
     public Admin() {
     }

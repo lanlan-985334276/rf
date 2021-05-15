@@ -13,6 +13,9 @@ public interface IProductService {
     Product update(Product product);
 
     List<Product> findAll(int userId);
+    List<Product> findAllCount(int userId);
 
     List<Product> findByPName(Product product);
+
+    Product findById(Product product);
 }

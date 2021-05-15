@@ -7,7 +7,9 @@ import com.example.rongfu.service.IUploadImgService;
 import com.example.rongfu.service.ex.FailedException;
 import com.example.rongfu.util.DateUtils;
 import com.example.rongfu.util.JsonResult;
+import com.example.rongfu.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,22 +23,28 @@ public class CustomerController extends BaseController {
 
     @Autowired
     private ICustomerService customerService;
-    @Autowired
-    private IUploadImgService uploadImgService;
 
     @RequestMapping("/all")
-    JsonResult<List<Customer>> allSignInLog(HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    JsonResult<List<Customer>> all(@RequestBody String userStr, HttpSession session) {
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = JsonUtils.json2User(userStr).getUserId();
         List<Customer> list = customerService.findAll(userId);
         return new JsonResult<>(OK, list);
     }
 
     @RequestMapping("/add")
-    JsonResult<Customer> add(Customer customer, String time, HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    JsonResult<Customer> add(@RequestBody String customerStr, HttpSession session) {
+        System.out.println(customerStr);
+        Customer customer=JsonUtils.json2Customer(customerStr);
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = customer.getUserId();
         customer.setUserId(userId);
         try {
-            customer.setAddTime(DateUtils.getDate(time));
+            customer.setAddTime(DateUtils.getDate(customer.getTime()));
         } catch (ParseException e) {
             e.printStackTrace();
             throw new FailedException("未知错误，请联系管理员！");
@@ -45,11 +53,15 @@ public class CustomerController extends BaseController {
     }
 
     @RequestMapping("/update")
-    JsonResult<Customer> update(Customer customer, String time, HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    JsonResult<Customer> update(@RequestBody String customerStr, HttpSession session) {
+        Customer customer=JsonUtils.json2Customer(customerStr);
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = customer.getUserId();
         customer.setUserId(userId);
         try {
-            customer.setAddTime(DateUtils.getDate(time));
+            customer.setAddTime(DateUtils.getDate(customer.getTime()));
         } catch (ParseException e) {
             e.printStackTrace();
             throw new FailedException("未知错误，请联系管理员！");
@@ -57,9 +69,13 @@ public class CustomerController extends BaseController {
         return new JsonResult<>(OK, customerService.update(customer));
     }
 
-    @RequestMapping("/deleteByStaffId")
-    JsonResult<Void> delete(Customer customer, HttpSession session) {
-        int userId = Integer.valueOf(session.getAttribute("userId").toString());
+    @RequestMapping("/delete")
+    JsonResult<Void> delete(@RequestBody String customerStr, HttpSession session) {
+        Customer customer=JsonUtils.json2Customer(customerStr);
+        int userId = 0;
+        if (session != null)
+            userId = Integer.valueOf(session.getAttribute("userId").toString());
+        else userId = customer.getUserId();
         customer.setUserId(userId);
         customerService.delete(customer);
         return new JsonResult<>(OK);
